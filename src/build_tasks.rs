@@ -1,10 +1,10 @@
 use std::fs;
 use anyhow::{Context, Result};
 use log::{info, warn, error};
-use reqwest::header::PUBLIC_KEY_PINS;
 use sys_mount::{unmount, Mount, MountFlags, UnmountFlags};
 
-use crate::common::{self, BASE_ROOTFS_FILE};
+use crate::common;
+use crate::signing;
 
 use common::{run_command, download_file, bind_mount};
 
@@ -96,6 +96,7 @@ pub fn rootfs_manage_packages(base_rootfs_path: &str) -> Result<()> {
 pub fn rootfs_compress_and_sign(rootfs_build_dir_path: &str, base_rootfs_path: &str, private_key_path: &str) -> Result<()> {
     let archive_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_FILE);
     run_command("mksquashfs", &[&base_rootfs_path, &archive_path, "-b", "32768", "-comp", "zstd", "-Xcompression-level", "22", "-no-xattrs"])?;
+    signing::sign_file(&private_key_path, &archive_path)?;
 
     Ok(())
 }

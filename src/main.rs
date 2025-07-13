@@ -7,6 +7,7 @@ use crate::common::mount_tmpfs_on_build_dir;
 
 mod common;
 mod build_tasks;
+mod signing;
 
 #[derive(Parser)]
 #[command(about = "Quill OS build and bootstrap tool")]

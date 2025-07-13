@@ -1028,6 +1028,7 @@ dependencies = [
  "clap",
  "env_logger",
  "log",
+ "openssl",
  "reqwest",
  "sys-mount",
 ]
