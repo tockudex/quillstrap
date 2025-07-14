@@ -43,7 +43,6 @@ pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
     // Set up the chroot
     rootfs_setup_chroot(&rootfs_build_dir_path, &base_rootfs_path, &merged_rootfs_path)?;
     // Installing packages/updating the chroot
-    // Prevent crash in case this command errors out because xbps needs to be updated
     rootfs_manage_packages(&merged_rootfs_path)?;
     rootfs_tear_down_chroot(&merged_rootfs_path)?;
     rootfs_compress_and_sign(&rootfs_build_dir_path, &merged_rootfs_path, &private_key_path)?;
