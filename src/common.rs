@@ -6,10 +6,14 @@ use sys_mount::{unmount, Mount, UnmountFlags};
 
 pub const ROOTFS_BUILD_DIR: &str = "rootfs/";
 pub const ROOTFS_BASE_DIR: &str = "base/";
-pub const BASE_ROOTFS_URL: &str = "https://repo-default.voidlinux.org/live/current/void-aarch64-ROOTFS-20250202.tar.xz";
+pub const BASE_ROOTFS_URL: &str = "https://armtix.artixlinux.org/images/armtix-openrc-20250403.tar.xz";
 pub const BASE_ROOTFS_FILE: &str = "base_rootfs.tar.xz";
 pub const DOWNLOADS_DIR: &str = "download/";
 pub const ROOTFS_FILE: &str = "rootfs.squashfs";
+pub const ROOTFS_OVERLAY_REPO_URL: &str = "https://github.com/PorQ-Pine/rootfs-overlay";
+pub const ROOTFS_OVERLAY_DIR: &str = "overlay/";
+pub const MERGED_ROOTFS_DIR: &str = "merged/";
+pub const ROOTFS_COW_DIR: &str = "write/";
 
 pub fn run_command(command: &str, args: &[&str]) -> Result<()> {
     info!("Running command '{}' with arguments '{}'", &command, &args.join(" "));
