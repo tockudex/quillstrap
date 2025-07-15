@@ -2,7 +2,7 @@ use std::fs;
 use std::process::Command;
 use anyhow::{Context, Result};
 use log::{info, warn, error};
-use sys_mount::{unmount, Mount, MountFlags, UnmountFlags};
+use sys_mount::{unmount, Mount, UnmountFlags};
 use git2::Repository;
 
 use crate::common;
@@ -23,7 +23,7 @@ pub fn kernel(build_dir: &str) -> Result<()> {
 /* END KERNEL */
 
 /* BEGIN ROOTFS */
-pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
+pub fn rootfs(build_dir: &str, private_key_path: &str, unrestricted_system: bool) -> Result<()> {
     let rootfs_build_dir_path = format!("{}/{}", &build_dir, &common::ROOTFS_BUILD_DIR);
     let base_rootfs_archive_path = format!("{}/../{}/{}", &build_dir, &common::DOWNLOADS_DIR, &common::BASE_ROOTFS_FILE);
     let base_rootfs_path = format!("{}/{}/{}", &build_dir, &common::ROOTFS_BUILD_DIR, &common::ROOTFS_BASE_DIR);
@@ -45,9 +45,9 @@ pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
     info!("Extracting root filesystem base");
     run_command("tar", &["-C", &base_rootfs_path, "-xvf", &base_rootfs_archive_path])?;
     // Set up the chroot
-    rootfs_setup_chroot(&rootfs_build_dir_path, &base_rootfs_path, &merged_rootfs_path)?;
+    rootfs_setup_chroot(&rootfs_build_dir_path, &base_rootfs_path, &merged_rootfs_path, unrestricted_system)?;
     // Install packages/updating the chroot
-    rootfs_manage_packages(&merged_rootfs_path)?;
+    rootfs_manage_packages(&merged_rootfs_path, unrestricted_system)?;
     rootfs_tear_down_chroot(&merged_rootfs_path)?;
     // Compress the rootfs
     rootfs_compress_and_sign(&rootfs_build_dir_path, &merged_rootfs_path, &private_key_path)?;
@@ -55,19 +55,24 @@ pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn rootfs_setup_chroot(rootfs_build_dir_path: &str, base_rootfs_path: &str, merged_rootfs_path: &str) -> Result<()> {
-    let rootfs_overlay_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_OVERLAY_DIR);
+pub fn rootfs_setup_chroot(rootfs_build_dir_path: &str, base_rootfs_path: &str, merged_rootfs_path: &str, unrestricted_system: bool) -> Result<()> {
+    let rootfs_overlay_repository_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_OVERLAY_DIR);
     let rootfs_cow_dir_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_COW_DIR);
     let rootfs_work_dir_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_WORK_DIR);
-    fs::create_dir_all(&rootfs_overlay_path)?;
+    fs::create_dir_all(&rootfs_overlay_repository_path)?;
     fs::create_dir_all(&rootfs_cow_dir_path)?;
     fs::create_dir_all(&rootfs_work_dir_path)?;
 
     // Clone rootfs overlay repository for seamless packaging of static/custom files into final root filesystem
     info!("Cloning rootfs-overlay repository");
-    Repository::clone(&common::ROOTFS_OVERLAY_REPO_URL, &rootfs_overlay_path)?;
+    Repository::clone(&common::ROOTFS_OVERLAY_REPO_URL, &rootfs_overlay_repository_path)?;
+    let common_rootfs_overlay_path = format!("{}/common", &rootfs_overlay_repository_path);
+    let specific_rootfs_overlay_path = match unrestricted_system {
+        true => format!("{}/unrestricted", &rootfs_overlay_repository_path),
+        false => format!("{}/restricted", &rootfs_overlay_repository_path),
+    };
     // Merge the two fileystems
-    run_command("fuse-overlayfs", &["-o", &format!("allow_other,lowerdir={}:{},upperdir={},workdir={}", &rootfs_overlay_path, &base_rootfs_path, &rootfs_cow_dir_path, &rootfs_work_dir_path), &merged_rootfs_path])?;
+    run_command("fuse-overlayfs", &["-o", &format!("allow_other,lowerdir={}:{}:{},upperdir={},workdir={}", &common_rootfs_overlay_path, &specific_rootfs_overlay_path, &base_rootfs_path, &rootfs_cow_dir_path, &rootfs_work_dir_path), &merged_rootfs_path])?;
 
     info!("Mounting chroot filesystems");
     Mount::builder().fstype("proc").mount("proc", &format!("{}/proc", &merged_rootfs_path))?;
@@ -103,8 +108,13 @@ pub fn rootfs_run_chroot_command(merged_rootfs_path: &str, command: &[&str]) -> 
     Ok(())
 }
 
-pub fn rootfs_manage_packages(merged_rootfs_path: &str) -> Result<()> {
+pub fn rootfs_manage_packages(merged_rootfs_path: &str, unrestricted_system: bool) -> Result<()> {
     rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "--assumeyes", "update"])?;
+    rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "--assumeyes", "install", "zsh"])?;
+    if unrestricted_system {
+        rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "--assumeyes", "install", "openssh-server"])?;
+        rootfs_run_chroot_command(&merged_rootfs_path, &["systemctl", "enable", "sshd"])?;
+    }
     rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "clean", "all"])?;
 
     Ok(())

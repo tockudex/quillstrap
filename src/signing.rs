@@ -1,4 +1,3 @@
-use openssl::rsa::Rsa;
 use openssl::pkey::PKey;
 use openssl::sign::Signer;
 use openssl::hash::MessageDigest;

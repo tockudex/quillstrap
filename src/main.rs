@@ -28,6 +28,8 @@ pub struct Args {
     build_dir: String,
     #[arg(long, help = "Private key location", required = true)]
     private_key_path: String,
+    #[arg(long, help = "Unrestricted system (allow SSH/root access)", default_value_t = false)]
+    unrestricted_system: bool,
 }
 
 fn main() -> Result<()> {
@@ -39,7 +41,7 @@ fn main() -> Result<()> {
 
     if args.build_u_boot { build_tasks::u_boot(&args.build_dir)?; }
     if args.build_kernel { build_tasks::kernel(&args.build_dir)?; }
-    if args.build_rootfs { build_tasks::rootfs(&args.build_dir, &args.private_key_path)?; }
+    if args.build_rootfs { build_tasks::rootfs(&args.build_dir, &args.private_key_path, args.unrestricted_system)?; }
 
     info!("All done!");
     Ok(())
