@@ -1,4 +1,5 @@
 use std::fs;
+use std::process::Command;
 use anyhow::{Context, Result};
 use log::{info, warn, error};
 use sys_mount::{unmount, Mount, MountFlags, UnmountFlags};
@@ -35,16 +36,20 @@ pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
     // Download base
     if !fs::exists(&base_rootfs_archive_path)? {
         info!("Downloading root filesystem base");
-        download_file(&common::BASE_ROOTFS_URL, &base_rootfs_archive_path)?;
+        let latest_build = Command::new("bash").args(["-c", &format!("curl -s {} | grep href | tail -n 3 | cut -c 10-25 | tail -n 1", &common::BASE_ROOTFS_URL)]).output()?;
+        let mut latest_build_str = String::from_utf8(latest_build.stdout)?;
+        latest_build_str.pop();
+        download_file(&format!("{}{}/rootfs.tar.xz", &common::BASE_ROOTFS_URL, &latest_build_str), &base_rootfs_archive_path)?;
     }
     // Extract it
     info!("Extracting root filesystem base");
     run_command("tar", &["-C", &base_rootfs_path, "-xvf", &base_rootfs_archive_path])?;
     // Set up the chroot
     rootfs_setup_chroot(&rootfs_build_dir_path, &base_rootfs_path, &merged_rootfs_path)?;
-    // Installing packages/updating the chroot
+    // Install packages/updating the chroot
     rootfs_manage_packages(&merged_rootfs_path)?;
     rootfs_tear_down_chroot(&merged_rootfs_path)?;
+    // Compress the rootfs
     rootfs_compress_and_sign(&rootfs_build_dir_path, &merged_rootfs_path, &private_key_path)?;
 
     Ok(())
@@ -52,15 +57,17 @@ pub fn rootfs(build_dir: &str, private_key_path: &str) -> Result<()> {
 
 pub fn rootfs_setup_chroot(rootfs_build_dir_path: &str, base_rootfs_path: &str, merged_rootfs_path: &str) -> Result<()> {
     let rootfs_overlay_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_OVERLAY_DIR);
-    let cow_directory_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_COW_DIR);
+    let rootfs_cow_dir_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_COW_DIR);
+    let rootfs_work_dir_path = format!("{}/{}", &rootfs_build_dir_path, &common::ROOTFS_WORK_DIR);
     fs::create_dir_all(&rootfs_overlay_path)?;
-    fs::create_dir_all(&cow_directory_path)?;
+    fs::create_dir_all(&rootfs_cow_dir_path)?;
+    fs::create_dir_all(&rootfs_work_dir_path)?;
 
     // Clone rootfs overlay repository for seamless packaging of static/custom files into final root filesystem
     info!("Cloning rootfs-overlay repository");
     Repository::clone(&common::ROOTFS_OVERLAY_REPO_URL, &rootfs_overlay_path)?;
     // Merge the two fileystems
-    run_command("unionfs", &["-o", "cow", "-o", "allow_other", &format!("{}=RW:{}=RO:{}=RO", &cow_directory_path, &rootfs_overlay_path, &base_rootfs_path), &merged_rootfs_path])?;
+    run_command("fuse-overlayfs", &["-o", &format!("allow_other,lowerdir={}:{},upperdir={},workdir={}", &rootfs_overlay_path, &base_rootfs_path, &rootfs_cow_dir_path, &rootfs_work_dir_path), &merged_rootfs_path])?;
 
     info!("Mounting chroot filesystems");
     Mount::builder().fstype("proc").mount("proc", &format!("{}/proc", &merged_rootfs_path))?;
@@ -69,7 +76,7 @@ pub fn rootfs_setup_chroot(rootfs_build_dir_path: &str, base_rootfs_path: &str, 
     Mount::builder().fstype("tmpfs").mount("tmpfs", &format!("{}/run", &merged_rootfs_path))?;
     Mount::builder().fstype("devtmpfs").mount("devtmpfs", &format!("{}/dev", &merged_rootfs_path))?;
     let resolv_conf_path = format!("{}/etc/resolv.conf", &merged_rootfs_path);
-    fs::File::create(&resolv_conf_path).with_context(|| "Could not touch resolv.conf in chroot")?;
+    // fs::File::create(&resolv_conf_path).with_context(|| "Could not touch resolv.conf in chroot")?;
     bind_mount("/etc/resolv.conf", &resolv_conf_path).with_context(|| "Could not bind-mount resolv.conf")?;
 
     Ok(())
@@ -87,7 +94,6 @@ pub fn rootfs_tear_down_chroot(merged_rootfs_path: &str) -> Result<()> {
 }
 
 pub fn rootfs_run_chroot_command(merged_rootfs_path: &str, command: &[&str]) -> Result<()> {
-    info!("Running the following command in rootfs base chroot: '{}'", &command.join(" "));
     let mut args: Vec<&str> = Vec::with_capacity(1 + command.len());
     args.push(&merged_rootfs_path);
     args.extend_from_slice(&command);
@@ -98,9 +104,8 @@ pub fn rootfs_run_chroot_command(merged_rootfs_path: &str, command: &[&str]) -> 
 }
 
 pub fn rootfs_manage_packages(merged_rootfs_path: &str) -> Result<()> {
-    rootfs_run_chroot_command(&merged_rootfs_path, &["pacman", "-R", "--noconfirm", "linux-aarch64", "linux-aarch64-headers", "linux-aarch64-lts", "linux-aarch64-lts-headers", "linux-firmware", "linux-firmware-whence"])?;
-    rootfs_run_chroot_command(&merged_rootfs_path, &["pacman", "--noconfirm", "-Syu", "pacman-contrib"])?;
-    rootfs_run_chroot_command(&merged_rootfs_path, &["paccache", "-rk0"])?;
+    rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "--assumeyes", "update"])?;
+    rootfs_run_chroot_command(&merged_rootfs_path, &["dnf", "clean", "all"])?;
 
     Ok(())
 }

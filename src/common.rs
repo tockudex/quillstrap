@@ -6,7 +6,7 @@ use sys_mount::{unmount, Mount, UnmountFlags};
 
 pub const ROOTFS_BUILD_DIR: &str = "rootfs/";
 pub const ROOTFS_BASE_DIR: &str = "base/";
-pub const BASE_ROOTFS_URL: &str = "https://armtix.artixlinux.org/images/armtix-openrc-20250403.tar.xz";
+pub const BASE_ROOTFS_URL: &str = "https://images.linuxcontainers.org/images/fedora/42/arm64/default/";
 pub const BASE_ROOTFS_FILE: &str = "base_rootfs.tar.xz";
 pub const DOWNLOADS_DIR: &str = "download/";
 pub const ROOTFS_FILE: &str = "rootfs.squashfs";
@@ -14,6 +14,7 @@ pub const ROOTFS_OVERLAY_REPO_URL: &str = "https://github.com/PorQ-Pine/rootfs-o
 pub const ROOTFS_OVERLAY_DIR: &str = "overlay/";
 pub const MERGED_ROOTFS_DIR: &str = "merged/";
 pub const ROOTFS_COW_DIR: &str = "write/";
+pub const ROOTFS_WORK_DIR: &str = "work/";
 
 pub fn run_command(command: &str, args: &[&str]) -> Result<()> {
     info!("Running command '{}' with arguments '{}'", &command, &args.join(" "));
