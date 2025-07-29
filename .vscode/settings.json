@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "${workspaceFolder}/quillstrap/Cargo.toml",
+    ],
+}

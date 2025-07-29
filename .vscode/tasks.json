@@ -1,0 +1,19 @@
+{
+    // Used extension: actboy168.tasks
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "First time setup",
+            "type": "shell",
+            "command": "other/setup/first_setup.sh",
+            "icon": {
+                "id": "debug-start",
+            },
+            "options": {
+                "statusbar": {
+                    "color": "#ff8c8c"
+                }
+            }
+        },
+    ]
+}
