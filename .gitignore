@@ -1,3 +1,6 @@
-/target
-/build
-/download
+*/target
+
+.root/.cargo/*
+!.root/.cargo/.gitkeep
+.root/.rustup/*
+!.root/.rustup/.gitkeep

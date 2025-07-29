@@ -1,0 +1,18 @@
+{
+    "build": { "dockerfile": "../other/setup/Dockerfile" },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "actboy168.tasks",
+                "rust-lang.rust-analyzer",
+                "Slint.slint"
+            ]
+        }
+    },
+	"mounts": [
+		"source=/dev/,target=/dev/,type=bind,consistency=consistent",
+        "source=${localWorkspaceFolder}/.root/.cargo/,target=/root/.cargo/,type=bind,consistency=consistent",
+        "source=${localWorkspaceFolder}/.root/.rustup/,target=/root/.rustup/,type=bind,consistency=consistent"
+	],
+	"privileged": true
+}
