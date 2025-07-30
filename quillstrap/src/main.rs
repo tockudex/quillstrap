@@ -1,19 +1,27 @@
-use anyhow::Result;
-use clap::Parser;
-use log::info;
+use crate::prelude::*;
 
+use crate::{args::Args, logic::choose_mode};
+
+pub mod args;
+pub mod logic;
+pub mod prelude;
 pub mod thetrait;
-
-#[derive(Parser)]
-#[command(about = "Quill OS build and bootstrap tool")]
-pub struct Args {
-
-}
+pub mod config;
+pub mod common;
 
 fn main() -> Result<()> {
-    env_logger::init();
-    let args = Args::parse();
+    color_eyre::install()?;
 
-    info!("All done!");
+    // The env is named RUST_LOG
+    env_logger::init_from_env(
+        env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, "info"),
+    );
+    let args = Args::parse_validate();
+    let config = Config::load();
+
+    choose_mode(args);
+
+
+    info!("All done, bye!");
     Ok(())
 }

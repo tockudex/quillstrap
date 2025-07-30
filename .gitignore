@@ -4,3 +4,5 @@
 !.root/.cargo/.gitkeep
 .root/.rustup/*
 !.root/.rustup/.gitkeep
+
+*.ron
