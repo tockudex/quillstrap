@@ -1,12 +1,12 @@
 pub trait SetupThing {
-    fn name() -> &'static str; // By this name other setup things will specify it's dependiecies
-    // Relative path to this one, ends with /, it will be created ../ of the porqpine rust project (so still in the repo, because devcontainer)
+    fn name() -> &'static str; // By this name, other setup things will specify their dependencies
+    // Relative path to this folder's path, created one folder up (../), ends with / (will still be in the repository)
     fn path() -> &'static str;
-    // List of deps (depending on arguments, to be builded before this one)
+    // List of deps (depending on arguments, to be built before a target)
     fn deps() -> Vec< &'static str>;
-    fn git() -> &'static str; // Git repo name, the link and type (ssh, https) is choosen by the config
-    fn clean() -> Result<(), String>; // Cleans all build related files
-    fn build() -> Result<(), String>; // Builds all things
+    fn git() -> &'static str; // Git repo name, the link and type (ssh, https) depends on the configuration
+    fn clean() -> Result<(), String>; // Cleans all build-related files
+    fn build() -> Result<(), String>; // Builds everything
     fn deploy() -> Result<(), String>;
     fn run() -> Result<(), String>;
 }

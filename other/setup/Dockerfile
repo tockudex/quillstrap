@@ -1,15 +1,15 @@
 FROM --platform=linux/amd64 ubuntu:24.04
 
-# Container missing stuff
+# Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
 RUN apt-get update && apt-get install -y htop psmisc
 
 # Rust stuff
 RUN apt-get install -y gcc build-essential curl pkg-config libinput10
-ENV PATH=$PATH:/root/.cargo/bin
+ENV PATH="${PATH}:/root/.cargo/bin"
 
-# Vscode stuff
+# VS Code stuff
 RUN apt-get install -y git
 
-# Quillstrap stuff
+# quillstrap stuff
 RUN apt-get install -y openssl libssl-dev clang
