@@ -5,3 +5,6 @@ pub use color_eyre::eyre::Result;
 pub use crate::common::io::*;
 pub use crate::Options;
 pub use crate::thetrait::SetupThing;
+pub use crate::TraitWrapper::*;
+pub use crate::logic::*;
+pub use crate::common::git::*;

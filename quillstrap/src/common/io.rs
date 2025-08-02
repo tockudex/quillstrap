@@ -16,7 +16,10 @@ pub fn remove_file(path: String) -> Result<(), std::io::Error> {
     match std::fs::remove_file(path.clone()) {
         Ok(_) => Ok(()),
         Err(e) => {
-            error!("Failed to remove file at path: \"{}\", error: {:?}", &path, e);
+            error!(
+                "Failed to remove file at path: \"{}\", error: {:?}",
+                &path, e
+            );
             Err(e)
         }
     }
@@ -28,4 +31,9 @@ pub fn dir_exists(path: &str) -> bool {
 
 pub fn dir_change(path: &str) {
     env::set_current_dir(path).expect(&format!("Failed to change directory to: {}", path))
+}
+
+pub fn mkdir_p(path: &str) {
+    let dir = Path::new(path);
+    std::fs::create_dir_all(dir).expect(&format!("Failed to create dir at: {}", path));
 }

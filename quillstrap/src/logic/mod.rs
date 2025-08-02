@@ -10,3 +10,11 @@ pub fn choose_mode(options: Options) {
         auto_main(options);
     }
 }
+
+const MAIN_BUILD_DIR: &str = "build_all";
+// We assume we runned simple cargo run, nothing fancy
+pub fn things_setup() {
+    dir_change("../");
+    mkdir_p(MAIN_BUILD_DIR);
+    dir_change(MAIN_BUILD_DIR);
+}

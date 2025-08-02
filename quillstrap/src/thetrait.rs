@@ -1,5 +1,5 @@
 // You also need to implement new()
-pub trait SetupThing {
+pub trait SetupThing: Copy + Clone + Default {
     fn name(&self) -> &'static str; // By this name, other setup things will specify their dependencies
     // Relative path to this folder's path, created one folder up (../), ends with / (will still be in the repository) - it should almost always be the path like its in quillstrap
     // So like uboot is in things/low/uboot in this project then his path is low/
@@ -8,6 +8,8 @@ pub trait SetupThing {
     fn deps(&self) -> Vec< &'static str>;
     // Not sure
     // fn deep_deps() -> Vec< &'static str>; // Deep deps, where deps is just what is necceserry to run, deep deps is everything that is needed to run
+
+    // All of those functions assume we are in the proper directory / repo already
     fn git(&self) -> &'static str; // Git repo name, the link and type (ssh, https) depends on the configuration
     fn get(&self) -> Result<(), String>; // How to get it, also updates it (git pull or else)
     fn clean(&self) -> Result<(), String>; // Cleans all build-related files

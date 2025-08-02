@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-use crate::things::get_things;
+use crate::things::{get_things, TraitWrapper};
 use crate::{args::Args, logic::choose_mode};
 
 pub mod args;
@@ -11,10 +11,11 @@ pub mod config;
 pub mod common;
 pub mod things;
 
+#[derive(Clone)]
 pub struct Options {
     pub args: Args,
     pub config: Config,
-    pub things: Vec<Box<dyn SetupThing>>,
+    pub things: Vec<TraitWrapper>,
 }
 
 fn main() -> Result<()> {

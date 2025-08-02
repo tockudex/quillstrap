@@ -1,5 +1,6 @@
 use crate::{prelude::*, thetrait::SetupThing};
 
+#[derive(Clone, Copy, Default)]
 pub struct Uboot {
     
 }
@@ -12,11 +13,11 @@ impl Uboot {
 
 impl SetupThing for Uboot {
     fn name(&self) -> &'static str {
-        todo!()
+        "uboot"
     }
 
     fn path(&self) -> &'static str {
-        todo!()
+        "low/"
     }
 
     fn deps(&self) -> Vec< &'static str> {
@@ -24,7 +25,7 @@ impl SetupThing for Uboot {
     }
 
     fn git(&self) -> &'static str {
-        todo!()
+        "u-boot-pinenote"
     }
 
     fn get(&self) -> std::result::Result<(), String> {

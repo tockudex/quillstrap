@@ -6,3 +6,5 @@
 !.root/.rustup/.gitkeep
 
 *.ron
+
+build_all/

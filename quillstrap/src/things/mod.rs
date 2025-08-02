@@ -2,14 +2,20 @@ use crate::{prelude::*, things::low::uboot::Uboot};
 
 pub mod low;
 
-pub fn get_things() -> Vec<Box<dyn SetupThing>> {
-    vec![Box::new(Uboot::new())]
+#[derive(Clone, Copy)]
+pub enum TraitWrapper {
+    TWUboot(Uboot),
 }
 
-pub fn get_thing_by_name(name: &str, things: Vec<Box<dyn SetupThing>>) -> impl SetupThing {
-    for thing in things.iter() {
-        if thing.name() == name {
-            return thing;
+pub fn get_things() -> Vec<TraitWrapper> {
+    vec![TWUboot(Uboot::default())]
+}
+
+pub fn get_thing_by_name(name: &str, things: &Vec<TraitWrapper>) -> impl SetupThing {
+    for thing in things {
+        match thing {
+            TWUboot(uboot) => return *uboot,
         }
     }
+    panic!("No item found in things, this is really weird: {}", name);
 }
