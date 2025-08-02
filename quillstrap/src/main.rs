@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+use crate::things::get_things;
 use crate::{args::Args, logic::choose_mode};
 
 pub mod args;
@@ -8,6 +9,13 @@ pub mod prelude;
 pub mod thetrait;
 pub mod config;
 pub mod common;
+pub mod things;
+
+pub struct Options {
+    pub args: Args,
+    pub config: Config,
+    pub things: Vec<Box<dyn SetupThing>>,
+}
 
 fn main() -> Result<()> {
     color_eyre::install()?;
@@ -18,8 +26,13 @@ fn main() -> Result<()> {
     );
     let args = Args::parse_validate();
     let config = Config::load();
+    let things = get_things();
 
-    choose_mode(args);
+    let options = Options {
+        args, config, things
+    };
+
+    choose_mode(options);
 
 
     info!("All done, bye!");

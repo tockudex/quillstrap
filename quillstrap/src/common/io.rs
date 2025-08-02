@@ -1,3 +1,5 @@
+use std::{env, path::Path};
+
 use crate::prelude::*;
 
 pub fn read_file_str(path: String) -> Result<String, std::io::Error> {
@@ -18,4 +20,12 @@ pub fn remove_file(path: String) -> Result<(), std::io::Error> {
             Err(e)
         }
     }
+}
+
+pub fn dir_exists(path: &str) -> bool {
+    Path::new(path).exists()
+}
+
+pub fn dir_change(path: &str) {
+    env::set_current_dir(path).expect(&format!("Failed to change directory to: {}", path))
 }

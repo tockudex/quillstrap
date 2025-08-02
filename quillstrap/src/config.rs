@@ -17,6 +17,7 @@ pub enum GitLinkType {
 
 #[derive(Default, Serialize, Deserialize, PartialEq, Clone)]
 pub enum GitPlatform {
+    // Gitlab is untested!
     Gitlab,
     #[default]
     Github,
@@ -24,9 +25,11 @@ pub enum GitPlatform {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Config {
-    git_link_type: GitLinkType,
-    git_platform: GitPlatform,
-    git_username: String,
+    pub git_link_type: GitLinkType,
+    pub git_platform: GitPlatform,
+    pub git_username: String,
+    // Show underlaying command output too
+    pub command_output: bool,
 }
 
 impl Default for Config {
@@ -35,6 +38,7 @@ impl Default for Config {
             git_link_type: Default::default(),
             git_platform: Default::default(),
             git_username: "PorQ-Pine".to_string(),
+            command_output: true,
         }
     }
 }

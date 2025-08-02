@@ -1,54 +1,59 @@
-pub trait SetupThing: Copy + Clone + Default {
-    fn name() -> &'static str; // By this name, other setup things will specify their dependencies
-    // Relative path to this folder's path, created one folder up (../), ends with / (will still be in the repository)
-    fn path() -> &'static str;
+// You also need to implement new()
+pub trait SetupThing {
+    fn name(&self) -> &'static str; // By this name, other setup things will specify their dependencies
+    // Relative path to this folder's path, created one folder up (../), ends with / (will still be in the repository) - it should almost always be the path like its in quillstrap
+    // So like uboot is in things/low/uboot in this project then his path is low/
+    fn path(&self) -> &'static str;
     // List of deps (depending on arguments, to be built before a target)
-    fn deps() -> Vec< &'static str>;
-    fn git() -> &'static str; // Git repo name, the link and type (ssh, https) depends on the configuration
-    fn get() -> Result<(), String>; // How to get it, also updates it (git pull or else)
-    fn clean() -> Result<(), String>; // Cleans all build-related files
-    fn build() -> Result<(), String>; // Builds everything
-    fn deploy() -> Result<(), String>; // The deployment will be based on a tree of deps, so the deepest things first
-    fn run() -> Result<(), String>;
+    fn deps(&self) -> Vec< &'static str>;
+    // Not sure
+    // fn deep_deps() -> Vec< &'static str>; // Deep deps, where deps is just what is necceserry to run, deep deps is everything that is needed to run
+    fn git(&self) -> &'static str; // Git repo name, the link and type (ssh, https) depends on the configuration
+    fn get(&self) -> Result<(), String>; // How to get it, also updates it (git pull or else)
+    fn clean(&self) -> Result<(), String>; // Cleans all build-related files
+    fn build(&self) -> Result<(), String>; // Builds everything
+    fn deploy(&self) -> Result<(), String>; // The deployment will be based on a tree of deps, so the deepest things first
+    fn run(&self) -> Result<(), String>;
 }
 
 #[derive(Clone, Copy, Default)]
 struct _ExampleImpl;
 
 impl SetupThing for _ExampleImpl {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "example"
     }
 
-    fn path() -> &'static str {
-        "example/"
+    fn path(&self) -> &'static str {
+        // root
+        ""
     }
     
-    fn deps() -> Vec< &'static str> {
+    fn deps(&self) -> Vec< &'static str> {
         vec!["example1", "example2"]
     }
     
-    fn git() -> &'static str {
+    fn git(&self) -> &'static str {
         "example_repo_name"
     }
     
-    fn get() -> Result<(), String> {
+    fn get(&self) -> Result<(), String> {
         todo!()
     }
 
-    fn clean() -> Result<(), String> {
+    fn clean(&self) -> Result<(), String> {
         todo!()
     }
     
-    fn build() -> Result<(), String> {
+    fn build(&self) -> Result<(), String> {
         todo!()
     }
     
-    fn deploy() -> Result<(), String> {
+    fn deploy(&self) -> Result<(), String> {
         todo!()
     }
     
-    fn run() -> Result<(), String> {
+    fn run(&self) -> Result<(), String> {
         todo!()
     }
 }
