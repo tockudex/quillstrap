@@ -14,5 +14,5 @@ RUN apt-get install -y git
 # quillstrap stuff
 RUN apt-get install -y openssl libssl-dev clang
 
-# Uboot build
+# U-Boot build
 RUN apt-get install -y coreutils device-tree-compiler python3 python3-pyelftools gcc-aarch64-linux-gnu

@@ -39,29 +39,30 @@ impl SetupThing for Uboot {
     fn build(&self) -> std::result::Result<(), String> {
         set_var("CROSS_COMPILE", "/usr/bin/aarch64-linux-gnu-");
 
-        info!("Building uboot defconfig");
+        info!("Building U-Boot (defconfig)");
         run_command("make rk3566-pinenote_defconfig", true)
             .expect("Failed to make rk3566-pinenote_defconfig");
 
-        info!("Building uboot rk3566-pinenote");
+        info!("Building U-Boot (rk3566-pinenote)");
         run_command("./make.sh rk3566-pinenote", true).expect("Failed to make.sh rk3566-pinenote");
-        info!("Running uboot trust");
+        info!("Building U-Boot (trust)");
         run_command("./make.sh trust", true).expect("Failed to make.sh trust");
 
-        info!("Building uboot spl");
+        info!("Building U-Boot (spl)");
         run_command("./make.sh spl", true).expect("Failed to make.sh spl");
-        info!("Running uboot trust, again");
+        info!("Building U-Boot (trust, again)");
         run_command("./make.sh trust", true).expect("Failed to make.sh trust (second time)");
         
         // Clean the var
         set_var("CROSS_COMPILE", "");
-        if !path_exists("uboot.img") {
+        let uboot_img_file = "uboot.img";
+        if !path_exists(&uboot_img_file) {
             let err =
-                "Failed to build uboot, everything seems fine but output file uboot.img is missing";
+                format!("Failed to build U-boot, everything seems fine but output file {} is missing", &uboot_img_file);
             error!("{}", err);
             return Err(err.to_string());
         } else {
-            info!("Builded uboot succesfully!");
+            info!("Built U-Boot succesfully!");
             return Ok(());
         }
     }
