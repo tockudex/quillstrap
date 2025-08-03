@@ -2,7 +2,7 @@ FROM --platform=linux/amd64 ubuntu:24.04
 
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
-RUN apt-get update && apt-get install -y htop psmisc wget unzip file
+RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio
 
 # Rust stuff
 RUN apt-get install -y gcc build-essential curl pkg-config libinput10 pkg-config libusb-1.0-0-dev libftdi1-dev libudev-dev

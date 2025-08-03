@@ -39,11 +39,11 @@ impl SetupThing for Rkbin {
         Ok(())
     }
 
-    fn build(&self, options: &Options) -> std::result::Result<(), String> {
+    fn build(&self, _options: &Options) -> std::result::Result<(), String> {
         Ok(())
     }
 
-    fn deploy(&self) -> std::result::Result<(), String> {
+    fn deploy(&self, _options: &Options) -> std::result::Result<(), String> {
         Ok(())
     }
 

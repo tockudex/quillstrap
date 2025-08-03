@@ -47,8 +47,8 @@ impl SetupThing for TraitWrapper {
         forward!(self.build(options))
     }
 
-    fn deploy(&self) -> Result<(), String> {
-        forward!(self.deploy())
+    fn deploy(&self, options: &Options) -> Result<(), String> {
+        forward!(self.deploy(options))
     }
 
     fn run(&self) -> Result<(), String> {

@@ -74,8 +74,28 @@ pub fn manual_main(options: Options) {
         dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
 
         impl_name
-            .deploy()
+            .deploy(&options)
             .expect(&format!("Failed to deploy for {}", name));
+
+        dir_change(
+            cur_dir
+                .to_str()
+                .expect("Failed to change PathBuf to string?"),
+        );
+    }
+
+    // Now we run
+    if let Some(name) = options.clone().args.run {
+        let impl_name = get_thing_by_name(&name, &options.things);
+
+        info!("Run for {}", name);
+        let cur_dir = dir_current();
+        mkdir_p(impl_name.path());
+        dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
+
+        impl_name
+            .run()
+            .expect(&format!("Failed to run {}", name));
 
         dir_change(
             cur_dir

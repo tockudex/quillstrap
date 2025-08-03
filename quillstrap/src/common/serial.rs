@@ -1,5 +1,9 @@
+use std::{time::Duration, u8};
+
 use crate::prelude::*;
-use serialport::SerialPortInfo;
+use serialport::{SerialPort, SerialPortInfo};
+
+const DEFAULT_BAUDRATE: u32 = 1500000;
 
 pub fn get_serial_devices_native() -> Vec<SerialPortInfo> {
     let mut ports2 = Vec::new();
@@ -82,4 +86,33 @@ pub fn choose_serial_port() -> String {
     }
 
     input
+}
+
+pub fn open_port(port: String) -> Box<dyn SerialPort> {
+    serialport::new(port.clone(), DEFAULT_BAUDRATE)
+        .timeout(Duration::from_millis(100))
+        .open()
+        .expect(&format!("Failed to open port: {}", port))
+}
+
+// No \n added at the end!
+pub fn send_serial_message(port: String, str: &str) {
+    let mut port_open = open_port(port.clone());
+    port_open
+        .write(str.as_bytes())
+        .expect(&format!("Failed to write to port: {}", port));
+}
+
+pub fn send_serial_ascii(port: String, ascii: u8) {
+    let mut port_open = open_port(port.clone());
+    port_open
+        .write(&[ascii])
+        .expect(&format!("Failed to write to port: {}", port));
+}
+
+pub fn read_serial(port: String, slice: &mut [u8]) {
+    let mut port_open = open_port(port.clone());
+    if let Err(err) = port_open.read(slice) {
+        warn!("Serial read error: {:?}", err);
+    }
 }
