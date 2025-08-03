@@ -1,4 +1,7 @@
-use crate::{common::commands::{run_command, run_shell_command}, prelude::*};
+use crate::{
+    common::commands::{run_command, run_shell_command},
+    prelude::*,
+};
 
 #[derive(Clone, Copy, Default)]
 pub struct Uboot {}
@@ -40,29 +43,40 @@ impl SetupThing for Uboot {
         set_var("CROSS_COMPILE", "/usr/bin/aarch64-linux-gnu-");
 
         info!("Building uboot defconfig");
-        run_command("make rk3566-pinenote_defconfig", options.config.command_output)
-            .expect("Failed to make rk3566-pinenote_defconfig");
+        run_command(
+            "make rk3566-pinenote_defconfig",
+            options.config.command_output,
+        )
+        .expect("Failed to make rk3566-pinenote_defconfig");
 
         info!("Building uboot rk3566-pinenote");
-        run_command("./make.sh rk3566-pinenote", options.config.command_output).expect("Failed to make.sh rk3566-pinenote");
+        run_command("./make.sh rk3566-pinenote", options.config.command_output)
+            .expect("Failed to make.sh rk3566-pinenote");
         info!("Running uboot trust");
-        run_command("./make.sh trust", options.config.command_output).expect("Failed to make.sh trust");
+        run_command("./make.sh trust", options.config.command_output)
+            .expect("Failed to make.sh trust");
 
         info!("Building uboot spl");
         run_command("./make.sh spl", options.config.command_output).expect("Failed to make.sh spl");
         info!("Running uboot trust, again");
-        run_command("./make.sh trust", options.config.command_output).expect("Failed to make.sh trust (second time)");
-        
+        run_command("./make.sh trust", options.config.command_output)
+            .expect("Failed to make.sh trust (second time)");
+
         info!("Running build of logotool_mod");
         let cur_dir = dir_current();
         mkdir_p("pinenote_ui/logotool_mod/build");
         dir_change("pinenote_ui/logotool_mod/build");
         run_command("cmake ..", options.config.command_output).expect("logotool_mod cmake failed");
-        run_command("cmake --build .", options.config.command_output).expect("logotool_mod cmake failed");
+        run_command("cmake --build .", options.config.command_output)
+            .expect("logotool_mod cmake failed");
         dir_change(cur_dir.to_str().unwrap());
 
         info!("Running build of boot menu");
-        run_shell_command("pushd pinenote_ui/; ./build_all.sh; popd", options.config.command_output).expect("Failed to build uboot boot menu");
+        run_shell_command(
+            "pushd pinenote_ui/; ./build_all.sh; popd",
+            options.config.command_output,
+        )
+        .expect("Failed to build uboot boot menu");
 
         // Clean the var
         set_var("CROSS_COMPILE", "");
@@ -78,7 +92,11 @@ impl SetupThing for Uboot {
     }
 
     fn deploy(&self) -> std::result::Result<(), String> {
-        todo!()
+        let port = choose_serial_port();
+        info!("Serial port choosed: {}", port);
+        show_wait_toast("Make sure uboot serial cli is running");
+
+        Ok(())
     }
 
     fn run(&self) -> std::result::Result<(), String> {

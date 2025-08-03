@@ -8,3 +8,6 @@ pub use crate::thetrait::SetupThing;
 pub use crate::TraitWrapper::*;
 pub use crate::logic::*;
 pub use crate::common::git::*;
+pub use crate::common::serial::*;
+pub use crate::common::cli::*;
+pub use dialoguer::{Input, theme::ColorfulTheme, Select, Confirm};

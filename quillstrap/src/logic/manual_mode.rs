@@ -63,4 +63,24 @@ pub fn manual_main(options: Options) {
                 .expect("Failed to change PathBuf to string?"),
         );
     }
+
+    // Now we deploy
+    for name in options.clone().args.deploy {
+        let impl_name = get_thing_by_name(&name, &options.things);
+
+        info!("Deploy for {}", name);
+        let cur_dir = dir_current();
+        mkdir_p(impl_name.path());
+        dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
+
+        impl_name
+            .deploy()
+            .expect(&format!("Failed to deploy for {}", name));
+
+        dir_change(
+            cur_dir
+                .to_str()
+                .expect("Failed to change PathBuf to string?"),
+        );
+    }
 }

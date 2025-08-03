@@ -5,7 +5,7 @@ FROM --platform=linux/amd64 ubuntu:24.04
 RUN apt-get update && apt-get install -y htop psmisc wget unzip file
 
 # Rust stuff
-RUN apt-get install -y gcc build-essential curl pkg-config libinput10
+RUN apt-get install -y gcc build-essential curl pkg-config libinput10 pkg-config libusb-1.0-0-dev libftdi1-dev libudev-dev
 ENV PATH="${PATH}:/root/.cargo/bin"
 
 # VS Code stuff

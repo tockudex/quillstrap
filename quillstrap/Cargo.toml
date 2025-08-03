@@ -5,15 +5,21 @@ edition = "2024"
 
 [dependencies]
 # TODO: sort this into topics, what uses what
-clap = { version = "4.5.41", features = ["derive"] }
-env_logger = "0.11.8"
 git2 = "0.20.2"
 log = "0.4.27"
 openssl = "0.10.73"
-reqwest = { version = "0.12.22", features = ["blocking"] }
 sys-mount = "3.0.1"
-color-eyre = "0.6" # CLI anyhow
 
 # Config
 serde = { version = "1.0.219", features = ["derive"] }
 ron = "0.10.1"
+
+# CLI
+clap = { version = "4.5.41", features = ["derive"] }
+env_logger = "0.11.8"
+color-eyre = "0.6" # CLI anyhow
+dialoguer = "0.11.0"
+
+# Remote
+reqwest = { version = "0.12.22", features = ["blocking"] }
+serialport = "4.7.2"
