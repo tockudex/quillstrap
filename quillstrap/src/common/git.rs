@@ -4,8 +4,10 @@ use crate::{common::commands::run_command, prelude::*};
 
 // Here we assume we are in the directory where the git repo should be
 pub fn git_get_manage(thing: &impl SetupThing, _options: &Options) {
-    if dir_exists(thing.name()) {
+    if path_exists(thing.name()) {
         dir_change(thing.name());
+        // Because the config can change, we change the remote url every time to be sure
+        set_remote_url(thing, _options);
         pull(thing, _options);
         dir_change("../");
     } else {
@@ -25,8 +27,21 @@ pub fn pull(thing: &impl SetupThing, options: &Options) {
 pub fn clone(thing: &impl SetupThing, options: &Options) {
     let url = assemble_git_link(thing.git(), options);
     info!("Clonning repo: {}", url);
-    run_command(&format!("git clone {} {}", url, thing.name()), options.config.command_output)
-        .expect(&format!("Failed to clone repo: {}", url));
+    run_command(
+        &format!("git clone {} {}", url, thing.name()),
+        options.config.command_output,
+    )
+    .expect(&format!("Failed to clone repo: {}", url));
+}
+
+pub fn set_remote_url(thing: &impl SetupThing, options: &Options) {
+    let url = assemble_git_link(thing.git(), options);
+    debug!("Setting remote url: {}", url);
+    run_command(
+        &format!("git remote set-url origin {}", url),
+        options.config.command_output,
+    )
+    .expect(&format!("Failed to clone repo: {}", url));
 }
 
 /*

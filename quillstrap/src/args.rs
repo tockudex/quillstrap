@@ -23,6 +23,7 @@ pub struct Args {
         help = "Things to get (or check for updates), seperated by space",
         num_args = 1..,
     )]
+    // Order is important in those vecs!
     pub get: Vec<String>,
     #[arg(
         short,long,

@@ -1,4 +1,7 @@
-use std::{env, path::Path};
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 
 use crate::prelude::*;
 
@@ -25,7 +28,7 @@ pub fn remove_file(path: String) -> Result<(), std::io::Error> {
     }
 }
 
-pub fn dir_exists(path: &str) -> bool {
+pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
@@ -37,3 +40,14 @@ pub fn mkdir_p(path: &str) {
     let dir = Path::new(path);
     std::fs::create_dir_all(dir).expect(&format!("Failed to create dir at: {}", path));
 }
+
+pub fn dir_current() -> PathBuf {
+    env::current_dir().expect("Failed to get the current dir")
+}
+
+pub fn set_var(key: &str, val: &str) {
+    unsafe {
+        env::set_var(key, val);
+    }
+}
+

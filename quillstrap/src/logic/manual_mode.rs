@@ -7,14 +7,60 @@ pub fn manual_main(options: Options) {
     // First, get
     for name in options.clone().args.get {
         let impl_name = get_thing_by_name(&name, &options.things);
-        info!("Managing repo for {}", name);
-        git_get_manage(&impl_name, &options);
-
-        // TODO move git get manage to get trait, pass options there
 
         info!("Get for {}", name);
+        let cur_dir = dir_current();
+        mkdir_p(impl_name.path());
+        dir_change(impl_name.path());
+
         impl_name
-            .get()
+            .get(&options)
             .expect(&format!("Failed to get for {}", name));
+
+        dir_change(
+            cur_dir
+                .to_str()
+                .expect("Failed to change PathBuf to string?"),
+        );
+    }
+
+    // Now we clean
+    for name in options.clone().args.clean {
+        let impl_name = get_thing_by_name(&name, &options.things);
+
+        info!("Clean for {}", name);
+        let cur_dir = dir_current();
+        mkdir_p(impl_name.path());
+        dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
+
+        impl_name
+            .clean()
+            .expect(&format!("Failed to clean for {}", name));
+
+        dir_change(
+            cur_dir
+                .to_str()
+                .expect("Failed to change PathBuf to string?"),
+        );
+    }
+
+    // Now we build
+    for name in options.clone().args.build {
+        let impl_name = get_thing_by_name(&name, &options.things);
+
+        info!("Build for {}", name);
+        let cur_dir = dir_current();
+        mkdir_p(impl_name.path());
+        dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
+
+        impl_name
+            .build()
+            .expect(&format!("Failed to build for {}", name));
+
+        dir_change(
+            cur_dir
+                .to_str()
+                .expect("Failed to change PathBuf to string?"),
+        );
     }
 }
