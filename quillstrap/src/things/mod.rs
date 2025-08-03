@@ -43,8 +43,8 @@ impl SetupThing for TraitWrapper {
         forward!(self.clean())
     }
 
-    fn build(&self) -> Result<(), String> {
-        forward!(self.build())
+    fn build(&self, options: &Options) -> Result<(), String> {
+        forward!(self.build(options))
     }
 
     fn deploy(&self) -> Result<(), String> {
@@ -66,5 +66,5 @@ pub fn get_thing_by_name(name: &str, things: &Vec<TraitWrapper>) -> TraitWrapper
             return *thing;
         }
     }
-    panic!("No item found in things, this is really weird: {}", name);
+    panic!("You probably mistyped this: {}", name);
 }

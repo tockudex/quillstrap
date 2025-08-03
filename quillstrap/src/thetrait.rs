@@ -15,7 +15,7 @@ pub trait SetupThing: Copy + Clone {
     // All of those functions assume we are in the proper directory / repo already
     // Except get!
     fn clean(&self) -> Result<(), String>; // Cleans all build-related files (DO NOT do git reset --hard)
-    fn build(&self) -> Result<(), String>; // Builds everything
+    fn build(&self, options: &Options) -> Result<(), String>; // Builds everything
     fn deploy(&self) -> Result<(), String>; // The deployment will be based on a tree of deps, so the deepest things first
     fn run(&self) -> Result<(), String>;
 }
@@ -49,7 +49,7 @@ impl SetupThing for _ExampleImpl {
         todo!()
     }
 
-    fn build(&self) -> Result<(), String> {
+    fn build(&self, _options: &Options) -> Result<(), String> {
         todo!()
     }
 

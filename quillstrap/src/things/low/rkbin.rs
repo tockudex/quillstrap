@@ -39,7 +39,7 @@ impl SetupThing for Rkbin {
         Ok(())
     }
 
-    fn build(&self) -> std::result::Result<(), String> {
+    fn build(&self, options: &Options) -> std::result::Result<(), String> {
         Ok(())
     }
 

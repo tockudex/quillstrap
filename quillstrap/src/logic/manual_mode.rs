@@ -54,7 +54,7 @@ pub fn manual_main(options: Options) {
         dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
 
         impl_name
-            .build()
+            .build(&options)
             .expect(&format!("Failed to build for {}", name));
 
         dir_change(
