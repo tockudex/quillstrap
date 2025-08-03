@@ -14,10 +14,10 @@ RUN apt-get install -y git
 # quillstrap stuff
 RUN apt-get install -y openssl libssl-dev clang
 
-# Uboot build
+# U-boot build
 RUN apt-get install -y coreutils device-tree-compiler python3 python3-pyelftools gcc-aarch64-linux-gnu 
 
-## Uboot boot menu
+## U-boot boot menu
 RUN apt-get install -y python3-pillow fonts-dejavu-core fonts-freefont-ttf fontconfig imagemagick libpng-dev cmake
 ### Instal u001 font
 RUN mkdir -p /tmp/fonti && \

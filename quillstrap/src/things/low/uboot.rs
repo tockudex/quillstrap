@@ -42,23 +42,23 @@ impl SetupThing for Uboot {
     fn build(&self, options: &Options) -> std::result::Result<(), String> {
         set_var("CROSS_COMPILE", "/usr/bin/aarch64-linux-gnu-");
 
-        info!("Building uboot defconfig");
+        info!("Building U-boot defconfig");
         run_command(
             "make rk3566-pinenote_defconfig",
             options.config.command_output,
         )
         .expect("Failed to make rk3566-pinenote_defconfig");
 
-        info!("Building uboot rk3566-pinenote");
+        info!("Building U-boot rk3566-pinenote");
         run_command("./make.sh rk3566-pinenote", options.config.command_output)
             .expect("Failed to make.sh rk3566-pinenote");
-        info!("Running uboot trust");
+        info!("Running U-boot trust");
         run_command("./make.sh trust", options.config.command_output)
             .expect("Failed to make.sh trust");
 
-        info!("Building uboot spl");
+        info!("Building U-boot spl");
         run_command("./make.sh spl", options.config.command_output).expect("Failed to make.sh spl");
-        info!("Running uboot trust, again");
+        info!("Running U-boot trust, again");
         run_command("./make.sh trust", options.config.command_output)
             .expect("Failed to make.sh trust (second time)");
 
@@ -76,17 +76,18 @@ impl SetupThing for Uboot {
             "pushd pinenote_ui/; ./build_all.sh; popd",
             options.config.command_output,
         )
-        .expect("Failed to build uboot boot menu");
+        .expect("Failed to build U-boot boot menu");
 
         // Clean the var
         set_var("CROSS_COMPILE", "");
-        if !path_exists("uboot.img") {
+        let uboot_img_file = "U-boot.img";
+        if !path_exists(&uboot_img_file) {
             let err =
-                "Failed to build uboot, everything seems fine but output file uboot.img is missing";
+                format!("Failed to build U-boot, everything seems fine but output file {} is missing", &uboot_img_file);
             error!("{}", err);
             return Err(err.to_string());
         } else {
-            info!("Builded uboot succesfully!");
+            info!("Built U-Boot succesfully!");
             return Ok(());
         }
     }
@@ -94,7 +95,7 @@ impl SetupThing for Uboot {
     fn deploy(&self) -> std::result::Result<(), String> {
         let port = choose_serial_port();
         info!("Serial port choosed: {}", port);
-        show_wait_toast("Make sure uboot serial cli is running");
+        show_wait_toast("Make sure U-boot serial cli is running");
 
         Ok(())
     }
