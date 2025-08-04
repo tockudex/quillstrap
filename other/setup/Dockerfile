@@ -38,3 +38,6 @@ RUN cd /tmp && \
     meson compile -C build && \
     meson install -C build && \
     rm -rf /tmp/rkdeveloptool
+
+# Kernel
+RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-dev libmpfr-dev findutils perl

@@ -1,12 +1,24 @@
 use crate::prelude::*;
 
-pub fn uboot_cli_rockusb(_options: &Options) -> Result<(), ()> {
+#[derive(PartialEq)]
+pub enum ToRockUsbStatus {
+    BootIntoSpl,
+    SkipAll,
+}
+
+pub fn uboot_cli_rockusb(_options: &Options) -> Result<ToRockUsbStatus, ()> {
     if get_serial_devices_native().is_empty() {
         show_wait_toast("Please plug in the serial port to the pinenote and to the host");
     }
 
     let port = choose_serial_port();
     info!("Serial port choosed: {}", port);
+
+    if port == "" {
+        warn!("No serial port selected, skipping the step of entering rockusb mode, lets say you are already there?");
+        return Ok(SkipAll);
+    }
+
     let message = format!(
         "Make sure U-boot serial cli is running.\nFirst reboot, then click the next button in the boot menu.\nThen use a command like \"tio -b 1500000 {}\" to enter the uboot cli.",
         port
@@ -50,7 +62,7 @@ pub fn uboot_cli_rockusb(_options: &Options) -> Result<(), ()> {
 
     show_wait_toast("Ok, now disconnect the usb dongle and connect directly to the pinenote");
 
-    Ok(())
+    Ok(BootIntoSpl)
 }
 
 pub fn rkdevelop_test(_options: &Options) -> Result<(), ()> {

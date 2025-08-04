@@ -14,3 +14,4 @@ pub use dialoguer::{Input, theme::ColorfulTheme, Select, Confirm};
 pub use crate::common::*;
 pub use crate::common::commands::*;
 pub use crate::common::deploy::*;
+pub use crate::ToRockUsbStatus::*;

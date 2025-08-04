@@ -92,8 +92,12 @@ impl SetupThing for Uboot {
     }
 
     fn deploy(&self, options: &Options) -> std::result::Result<(), String> {
-        uboot_cli_rockusb(options).expect("Failed to enter rock usb mode");
-        
+        let todo = uboot_cli_rockusb(options).expect("Failed to enter rock usb mode");
+
+        if todo == ToRockUsbStatus::SkipAll {
+            warn!("ToRuckUSBStatus is skip all, we don't flash spl loader, uboot deploy just exits, we assume we are already there");
+            return Ok(());
+        }
         /*
         info!("Ok, Putting pinenote into download mode");
         run_command(
@@ -113,12 +117,24 @@ impl SetupThing for Uboot {
         match rkdevelop_test(options) {
             Ok(_) => {
                 info!("Rkdevelop second test worked");
-            },
+            }
             Err(_) => {
                 let mess = "Rkdevelop second test failed";
                 error!("{}", mess);
                 return Err(mess.to_string());
-            },
+            }
+        }
+
+        let w = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt("in theory rkdevelop works now, do you want to flash new uboot?\nOtherwise you will stay in this mode (for example, for other tools that need rkdeveloptool)")
+        .default(true)
+        .show_default(true)
+        .wait_for_newline(true)
+        .interact()
+        .unwrap();
+
+        if !w {
+            return Ok(());
         }
 
         info!("Running rkdeveloptool write-partition uboot uboot.img");

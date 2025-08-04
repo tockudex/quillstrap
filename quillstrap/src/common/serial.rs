@@ -47,6 +47,12 @@ pub fn get_serial_devices() -> Vec<String> {
 pub fn choose_serial_port() -> String {
     let devices = get_serial_devices();
     let devices_clean = get_serial_devices_native_names();
+
+    if devices_clean.is_empty() {
+        warn!("No serial device found!");
+        return "".to_string();
+    }
+
     debug!("Devices that were found automatically: {:?}", devices);
     let mut input = String::new();
 

@@ -1,4 +1,7 @@
-use crate::{prelude::*, things::low::{rkbin::Rkbin, uboot::Uboot}};
+use crate::{
+    prelude::*,
+    things::low::{backup::Backup, rkbin::Rkbin, uboot::Uboot},
+};
 
 pub mod low;
 
@@ -6,6 +9,7 @@ pub mod low;
 pub enum TraitWrapper {
     TWUboot(Uboot),
     TWRkbin(Rkbin),
+    TWBackup(Backup),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -14,6 +18,7 @@ macro_rules! forward {
         match $self {
             TraitWrapper::TWUboot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWRkbin(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWBackup(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -57,7 +62,7 @@ impl SetupThing for TraitWrapper {
 }
 
 pub fn get_things() -> Vec<TraitWrapper> {
-    vec![TWUboot(Uboot::default()), TWRkbin(Rkbin::default())]
+    vec![TWUboot(Uboot::default()), TWRkbin(Rkbin::default()), TWBackup(Backup::default())]
 }
 
 pub fn get_thing_by_name(name: &str, things: &Vec<TraitWrapper>) -> TraitWrapper {
