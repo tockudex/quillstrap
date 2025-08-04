@@ -1,7 +1,4 @@
-use crate::{
-    common::commands::{run_command, run_shell_command},
-    prelude::*,
-};
+use crate::prelude::*;
 
 #[derive(Clone, Copy, Default)]
 pub struct Uboot {}
@@ -95,59 +92,34 @@ impl SetupThing for Uboot {
     }
 
     fn deploy(&self, options: &Options) -> std::result::Result<(), String> {
-        let port = choose_serial_port();
-        info!("Serial port choosed: {}", port);
-        let message = format!(
-            "Make sure U-boot serial cli is running. First reboot, then click the next button in the boot menu, then use a command like \"tio -b 1500000 {}\" to enter the uboot cli.",
-            port
-        );
-        show_wait_toast(&message);
-
-        // Hehe
-        let _ = run_command("killall -9 tio", false);
-        for _ in 0..5 {
-            send_serial_ascii(port.clone(), 0x03);
-            sleep_millis(50);
-        }
-
-        for _ in 0..5 {
-            send_serial_message(port.clone(), "\n\r");
-            sleep_millis(50);
-        }
-        sleep_millis(100);
-        send_serial_message(port.clone(), "rockusb 0 mmc 0\n\r");
-        sleep_millis(1000);
-        let mut serial_buf: Vec<u8> = vec![0; 200];
-        read_serial(port.clone(), &mut serial_buf);
-        sleep_millis(500);
-        read_serial(port.clone(), &mut serial_buf);
-
-        let ascii_chars: Vec<char> = serial_buf.iter().map(|&b| b as char).collect();
-        debug!("Serial buf received: {:?}", ascii_chars);
-
-        if ascii_chars.contains(&'/') && ascii_chars.contains(&'\\') && ascii_chars.contains(&'|') {
-            info!("Detected that rockusb is on!");
-        } else {
-            show_wait_toast(
-                "Failed to detect rockusb mode. Try to trigger it manually by typing \"rockusb 0 mmc 0\" in the serial monitor",
-            );
-        }
-        show_wait_toast("Ok, now disconnect the usb dongle and connect directly to the pinenote");
+        uboot_cli_rockusb(options).expect("Failed to enter rock usb mode");
+        
+        /*
         info!("Ok, Putting pinenote into download mode");
         run_command(
             "rkdeveloptool reboot-maskrom",
             options.config.command_output,
         )
         .expect("Failed to run: rkdeveloptool reboot-maskrom");
+        */
 
-        /*
         info!("Running rkdeveloptool boot rk356x_spl_loader_v1.20.114.bin");
         run_command(
             "rkdeveloptool boot rk356x_spl_loader_v1.20.114.bin",
             options.config.command_output,
         )
         .expect("Failed to write uboot");
-        */
+
+        match rkdevelop_test(options) {
+            Ok(_) => {
+                info!("Rkdevelop second test worked");
+            },
+            Err(_) => {
+                let mess = "Rkdevelop second test failed";
+                error!("{}", mess);
+                return Err(mess.to_string());
+            },
+        }
 
         info!("Running rkdeveloptool write-partition uboot uboot.img");
         run_command(

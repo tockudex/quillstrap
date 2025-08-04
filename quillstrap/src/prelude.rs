@@ -12,3 +12,5 @@ pub use crate::common::serial::*;
 pub use crate::common::cli::*;
 pub use dialoguer::{Input, theme::ColorfulTheme, Select, Confirm};
 pub use crate::common::*;
+pub use crate::common::commands::*;
+pub use crate::common::deploy::*;
