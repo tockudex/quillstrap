@@ -1,8 +1,9 @@
 use crate::{
     prelude::*,
-    things::low::{backup::Backup, rkbin::Rkbin, uboot::Uboot},
+    things::low::{backup::Backup, kernel::Kernel, rkbin::Rkbin, uboot::Uboot},
 };
 
+pub mod init;
 pub mod low;
 
 #[derive(Clone, Copy)]
@@ -10,6 +11,10 @@ pub enum TraitWrapper {
     TWUboot(Uboot),
     TWRkbin(Rkbin),
     TWBackup(Backup),
+    TWKernel(Kernel),
+    TWQuillInit(QuillInit),
+    TWSysroot(Sysroot),
+    TWAlpineChrootInstall(AlpineChrootInstall),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -19,6 +24,10 @@ macro_rules! forward {
             TraitWrapper::TWUboot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWRkbin(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWBackup(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWKernel(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWQuillInit(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWSysroot(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWAlpineChrootInstall(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -62,7 +71,15 @@ impl SetupThing for TraitWrapper {
 }
 
 pub fn get_things() -> Vec<TraitWrapper> {
-    vec![TWUboot(Uboot::default()), TWRkbin(Rkbin::default()), TWBackup(Backup::default())]
+    vec![
+        TWUboot(Uboot::default()),
+        TWRkbin(Rkbin::default()),
+        TWBackup(Backup::default()),
+        TWKernel(Default::default()),
+        TWQuillInit(Default::default()),
+        TWSysroot(Default::default()),
+        TWAlpineChrootInstall(Default::default()),
+    ]
 }
 
 pub fn get_thing_by_name(name: &str, things: &Vec<TraitWrapper>) -> TraitWrapper {

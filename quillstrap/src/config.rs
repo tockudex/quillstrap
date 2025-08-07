@@ -30,6 +30,7 @@ pub struct Config {
     pub git_username: String,
     // Show underlaying command output too
     pub command_output: bool,
+    pub main_private_key_path: String // Relative to root of the quillstrap repo!
 }
 
 impl Default for Config {
@@ -39,6 +40,7 @@ impl Default for Config {
             git_platform: Default::default(),
             git_username: "PorQ-Pine".to_string(),
             command_output: true,
+            main_private_key_path: String::from("other/private/private.pem"),
         }
     }
 }

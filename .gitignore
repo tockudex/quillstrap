@@ -8,3 +8,4 @@
 *.ron
 
 build_all/
+other/private/

@@ -1,14 +1,16 @@
+use std::env;
+
 use crate::prelude::*;
 
-use crate::things::{get_things, TraitWrapper};
+use crate::things::{TraitWrapper, get_things};
 use crate::{args::Args, logic::choose_mode};
 
 pub mod args;
+pub mod common;
+pub mod config;
 pub mod logic;
 pub mod prelude;
 pub mod thetrait;
-pub mod config;
-pub mod common;
 pub mod things;
 
 #[derive(Clone)]
@@ -16,6 +18,7 @@ pub struct Options {
     pub args: Args,
     pub config: Config,
     pub things: Vec<TraitWrapper>,
+    pub path_of_repo: String, // With / at the end
 }
 
 fn main() -> Result<()> {
@@ -26,15 +29,29 @@ fn main() -> Result<()> {
         env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, "info"),
     );
     let args = Args::parse_validate();
+
+    mkdir_p("../other/private");
     let config = Config::load();
     let things = get_things();
 
     let options = Options {
-        args, config, things
+        args,
+        config,
+        things,
+        path_of_repo: format!("{}/../", env::current_dir().unwrap().display().to_string()),
     };
 
-    choose_mode(options);
+    let private_key_path = &get_private_key_path(&options);
+    if !path_exists(private_key_path) {
+        warn!("Private key doesn't exist at path, I will create it, no need to thank me");
+        run_command(
+            &format!("openssl genrsa -out {} 2048", private_key_path),
+            options.config.command_output,
+        )
+        .expect("Failed to create private key");
+    }
 
+    choose_mode(options);
 
     info!("All done, bye!");
     Ok(())

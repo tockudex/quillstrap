@@ -16,3 +16,11 @@ if ! command -v ~/.cargo/bin/cargo &> /dev/null || \
 else
     echo "Rust is already installed, skipping installation."
 fi
+
+# Check if aarch64-unknown-linux-musl target is installed
+if ! rustup target list --installed | grep -q "^aarch64-unknown-linux-musl$"; then
+    echo "Installing aarch64-unknown-linux-musl target"
+    rustup target add aarch64-unknown-linux-musl
+else
+    echo "Target aarch64-unknown-linux-musl is already installed."
+fi

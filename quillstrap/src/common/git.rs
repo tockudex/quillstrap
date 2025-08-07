@@ -61,7 +61,7 @@ pub fn assemble_git_link(name: &str, options: &Options) -> String {
     }
 
     match options.config.git_link_type {
-        crate::config::GitLinkType::Ssh => link.push_str(":@"),
+        crate::config::GitLinkType::Ssh => link.push_str(":"),
         crate::config::GitLinkType::Https => link.push_str("/"),
     }
 
