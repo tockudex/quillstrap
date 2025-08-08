@@ -33,8 +33,30 @@ impl SetupThing for Sysroot {
         let cur_dir = dir_current();
         dir_change("../");
         // TODO: someone make this list smaller, not all is needed
-        let packages = "busybox busybox-extras libxkbcommon eudev udev-init-scripts libinput libgcc musl mtdev libevdev openssl fontconfig openrc pkgconf openssl-dev";
-        AlpineChrootInstall::setup_alpine_chroot(options, &format!("{}", self.name()), packages, "aarch64");
+        let package_vec: Vec<&str> = vec![
+            "busybox",
+            "busybox-extras",
+            "libxkbcommon",
+            "eudev",
+            "libinput",
+            "libgcc",
+            "musl",
+            "mtdev",
+            "libevdev",
+            "openssl",
+            "fontconfig",
+            "pkgconf",
+            "openssl-dev",
+            "eudev-dev",
+            "libinput-dev",
+            "libxkbcommon-dev",
+        ];
+        AlpineChrootInstall::setup_alpine_chroot(
+            options,
+            &format!("{}", self.name()),
+            package_vec,
+            "aarch64",
+        );
         dir_change(cur_dir.to_str().unwrap());
         Ok(())
     }

@@ -15,18 +15,17 @@ impl AlpineChrootInstall {
             thing.path(),
             thing.name()
         );
-        run_command(
-            &format!("{} {}", path, arguments),
-            options.config.command_output,
-        )
-        .expect("Failed to run alpine-chroot-install");
+        let str = &format!("{} {}", path, arguments);
+        info!("Running command: {}", str);
+        run_command(str, options.config.command_output)
+            .expect("Failed to run alpine-chroot-install");
     }
 
     // Chroot dir without / at the end
     pub fn setup_alpine_chroot(
         options: &crate::Options,
         chroot_dir: &str,
-        alpine_packages: &str,
+        alpine_packages: Vec<&str>,
         arch: &str,
     ) {
         umount_recursive(chroot_dir);
@@ -34,25 +33,28 @@ impl AlpineChrootInstall {
         remove_dir_all(chroot_dir).unwrap();
         AlpineChrootInstall::execute(
             options,
-            &format!("-d {} -p {} -a {}", chroot_dir, alpine_packages, arch),
+            &format!(
+                "-d {} -p {} -a {}",
+                chroot_dir,
+                alpine_packages.join(" -p "),
+                arch
+            ),
         );
         umount_recursive(chroot_dir);
 
-        // TODO
-        run_shell_command("mv sysroot/sysroot/* sysroot/", true).unwrap();
-        remove_dir_all("sysroot/sysroot").unwrap();
-
+        /*
         run_command(
-            &format!("chmod 555 {}/bin/bbsuid", chroot_dir),
+            &format!("chmod 555 {}/{}/bin/bbsuid", chroot_dir),
             options.config.command_output,
         )
         .unwrap();
 
-        remove_file(format!("{}/env.sh", chroot_dir)).ok();
-        remove_file(format!("{}/destroy", chroot_dir)).ok();
-        remove_file(format!("{}/enter-chroot", chroot_dir)).ok();
-        remove_file(format!("{}/etc/motd", chroot_dir)).ok();
-        remove_file(format!("{}/etc/resolv.conf", chroot_dir)).ok();
+        remove_file(format!("{}/{}/env.sh", chroot_dir)).ok();
+        remove_file(format!("{}/{}/destroy", chroot_dir)).ok();
+        remove_file(format!("{}/{}/enter-chroot", chroot_dir)).ok();
+        remove_file(format!("{}/{}/etc/motd", chroot_dir)).ok();
+        remove_file(format!("{}/{}/etc/resolv.conf", chroot_dir)).ok();
+        */
     }
 }
 

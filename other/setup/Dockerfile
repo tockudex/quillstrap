@@ -41,3 +41,9 @@ RUN cd /tmp && \
 
 # Kernel
 RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-dev libmpfr-dev findutils perl
+
+# Binfmt
+RUN apt-get install -y qemu-user-static binfmt-support
+RUN update-binfmts --enable
+# TODO: this shouldnt be set here but later but for now here because fucking linking
+ENV PATH="${PATH}:/workspaces/quillstrap/build_all/init/toolchain/aarch64-linux-musl-cross/bin"
