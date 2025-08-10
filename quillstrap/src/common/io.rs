@@ -41,8 +41,8 @@ pub fn mkdir_p(path: &str) {
     std::fs::create_dir_all(dir).expect(&format!("Failed to create dir at: {}", path));
 }
 
-pub fn dir_current() -> PathBuf {
-    env::current_dir().expect("Failed to get the current dir")
+pub fn dir_current() -> String {
+    env::current_dir().expect("Failed to get the current dir").to_str().unwrap().to_string()
 }
 
 pub fn set_var(key: &str, val: &str) {

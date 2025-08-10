@@ -15,3 +15,17 @@ pub fn umount_recursive(target: &str) {
         }
     }
 }
+
+pub fn is_mount_point(path: &str) -> bool {
+    let output = run_command_get_output(&format!("mountpoint {}", path));
+    if output.contains("is a mountpoint") {
+        return true;
+    }
+    false
+}
+
+pub fn mount_point(path: &str, mount_name: &str) {
+    if !is_mount_point(path) {
+        run_command(&format!("mount -t {} {} {}", mount_name, mount_name, path), false).expect("Failed to mount point");
+    }
+}

@@ -66,7 +66,7 @@ impl SetupThing for Uboot {
         run_command("cmake ..", options.config.command_output).expect("logotool_mod cmake failed");
         run_command("cmake --build .", options.config.command_output)
             .expect("logotool_mod cmake failed");
-        dir_change(cur_dir.to_str().unwrap());
+        dir_change(&cur_dir);
 
         info!("Running build of boot menu");
         run_shell_command(

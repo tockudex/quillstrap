@@ -17,11 +17,7 @@ pub fn manual_main(options: Options) {
             .get(&options)
             .expect(&format!("Failed to get for {}", name));
 
-        dir_change(
-            cur_dir
-                .to_str()
-                .expect("Failed to change PathBuf to string?"),
-        );
+        dir_change(&cur_dir);
     }
 
     // Now we clean
@@ -37,11 +33,7 @@ pub fn manual_main(options: Options) {
             .clean()
             .expect(&format!("Failed to clean for {}", name));
 
-        dir_change(
-            cur_dir
-                .to_str()
-                .expect("Failed to change PathBuf to string?"),
-        );
+        dir_change(&cur_dir);
     }
 
     // Now we build
@@ -57,11 +49,7 @@ pub fn manual_main(options: Options) {
             .build(&options)
             .expect(&format!("Failed to build for {}", name));
 
-        dir_change(
-            cur_dir
-                .to_str()
-                .expect("Failed to change PathBuf to string?"),
-        );
+        dir_change(&cur_dir);
     }
 
     // Now we deploy
@@ -77,11 +65,7 @@ pub fn manual_main(options: Options) {
             .deploy(&options)
             .expect(&format!("Failed to deploy for {}", name));
 
-        dir_change(
-            cur_dir
-                .to_str()
-                .expect("Failed to change PathBuf to string?"),
-        );
+        dir_change(&cur_dir);
     }
 
     // Now we run
@@ -93,14 +77,8 @@ pub fn manual_main(options: Options) {
         mkdir_p(impl_name.path());
         dir_change(&format!("{}{}", impl_name.path(), impl_name.name()));
 
-        impl_name
-            .run()
-            .expect(&format!("Failed to run {}", name));
+        impl_name.run().expect(&format!("Failed to run {}", name));
 
-        dir_change(
-            cur_dir
-                .to_str()
-                .expect("Failed to change PathBuf to string?"),
-        );
+        dir_change(&cur_dir);
     }
 }
