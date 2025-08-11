@@ -22,6 +22,6 @@ pub use crate::things::init::quill_init::*;
 pub use crate::things::init::sysroot::*;
 pub use crate::things::init::alpine_chroot_install::*;
 pub use crate::things::*;
-pub use crate::things::init::toolchain::*;
 pub use crate::things::init::branding::*;
 pub use std::fs::File;
+pub use crate::things::init::initrd::*;

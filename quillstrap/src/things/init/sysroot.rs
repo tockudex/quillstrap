@@ -62,7 +62,7 @@ impl SetupThing for Sysroot {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec![]
+        vec!["alpine-chroot-install"]
     }
 
     fn git(&self) -> &'static str {

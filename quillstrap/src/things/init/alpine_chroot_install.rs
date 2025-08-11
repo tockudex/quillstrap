@@ -44,21 +44,6 @@ impl AlpineChrootInstall {
             ),
         );
         umount_recursive(chroot_dir);
-
-        /*
-        // Path changed, this is wrong
-        run_command(
-            &format!("chmod 555 {}/{}/bin/bbsuid", chroot_dir),
-            options.config.command_output,
-        )
-        .unwrap();
-
-        remove_file(format!("{}/{}/env.sh", chroot_dir)).ok();
-        remove_file(format!("{}/{}/destroy", chroot_dir)).ok();
-        remove_file(format!("{}/{}/enter-chroot", chroot_dir)).ok();
-        remove_file(format!("{}/{}/etc/motd", chroot_dir)).ok();
-        remove_file(format!("{}/{}/etc/resolv.conf", chroot_dir)).ok();
-        */
     }
 
     // Dir, with / at the end. It's the path to the actual sysroot, not sysroot and usr next to it

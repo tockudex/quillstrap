@@ -15,8 +15,8 @@ pub enum TraitWrapper {
     TWQuillInit(QuillInit),
     TWSysroot(Sysroot),
     TWAlpineChrootInstall(AlpineChrootInstall),
-    TWToolchain(Toolchain),
     TWBranding(Branding),
+    TWInitRD(InitRD),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -30,8 +30,8 @@ macro_rules! forward {
             TraitWrapper::TWQuillInit(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWSysroot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWAlpineChrootInstall(inner) => inner.$method($($($arg),*)?),
-            TraitWrapper::TWToolchain(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWBranding(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWInitRD(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -83,8 +83,8 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TWQuillInit(Default::default()),
         TWSysroot(Default::default()),
         TWAlpineChrootInstall(Default::default()),
-        TWToolchain(Default::default()),
         TWBranding(Default::default()),
+        TWInitRD(Default::default()),
     ]
 }
 
