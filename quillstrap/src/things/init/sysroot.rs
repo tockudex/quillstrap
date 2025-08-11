@@ -21,7 +21,11 @@ impl Sysroot {
         dir_change(path);
         if !path_exists("quillstrap") || !is_mount_point("quillstrap") {
             mkdir_p("quillstrap");
-            run_command(&format!("mount --bind {} quillstrap/", options.path_of_repo), options.config.command_output).unwrap();
+            run_command(
+                &format!("mount --bind {} quillstrap/", options.path_of_repo),
+                options.config.command_output,
+            )
+            .unwrap();
         }
 
         run_shell_command(
@@ -30,6 +34,21 @@ impl Sysroot {
         )
         .unwrap();
         dir_change(&cur_dir);
+    }
+
+    pub fn execute_sysroot_command_dir(
+        command: &str,
+        absolute_path: &str,
+        options: &crate::Options,
+    ) {
+        // info!("Absolute path is: {}", absolute_path);
+        let better_path = format!(
+            "/quillstrap/{}{}",
+            MAIN_BUILD_DIR,
+            absolute_path.split(MAIN_BUILD_DIR).last().unwrap()
+        );
+        info!("Sysroot path is: {}", better_path);
+        Sysroot::execute_sysroot_command(&format!("cd {}; {}", better_path, command), options);
     }
 }
 

@@ -15,6 +15,16 @@ pub fn read_file_str(path: String) -> Result<String, std::io::Error> {
     }
 }
 
+pub fn copy_file(src: &str, dest: &str) -> Result<(), std::io::Error> {
+    match std::fs::copy(&src, &dest) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            error!("Failed to copy file from \"{}\" to \"{}\", error: {:?}", &src, &dest, e);
+            Err(e)
+        }
+    }
+}
+
 pub fn remove_file(path: String) -> Result<(), std::io::Error> {
     match std::fs::remove_file(path.clone()) {
         Ok(_) => Ok(()),

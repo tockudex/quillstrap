@@ -1,3 +1,5 @@
+use std::env::current_dir;
+
 use crate::prelude::*;
 
 #[derive(Clone, Copy, Default)]
@@ -31,8 +33,27 @@ impl SetupThing for QuillInit {
     }
 
     fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        run_command("cargo build --release", options.config.command_output)
-            .expect("Failed to build quill init");
+        let cur_dir = dir_current();
+        mkdir_p("out/");
+
+        dir_change("qinit");
+
+        // RUST_FLAGS=\"-C target-feature=-crt-static\" is applied in config.toml
+
+        // TODO features from config
+        Sysroot::execute_sysroot_command_dir(
+            "cargo build --release",
+            &cur_dir,
+            options,
+        );
+        copy_file("../target/release/qinit", "../out/qinit").unwrap();
+        Sysroot::execute_sysroot_command_dir(
+            "cargo build --release --features init_wrapper",
+            &cur_dir,
+            options,
+        );
+        copy_file("../target/release/qinit", "../out/init").unwrap();
+
         Ok(())
     }
 
