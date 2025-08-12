@@ -59,6 +59,7 @@ impl SetupThing for InitRD {
             "xz",
             "iwd",
             "openresolv",
+            "gocryptfs",
         ];
         AlpineChrootInstall::setup_alpine_chroot(
             options,
