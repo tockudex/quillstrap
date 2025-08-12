@@ -27,6 +27,9 @@ pub fn run_command(command: &str, show_output: bool) -> io::Result<()> {
 }
 
 pub fn run_shell_command(command: &str, show_output: bool) -> io::Result<()> {
+    if show_output {
+        info!("Executing {} in shell", command);
+    }
     let mut child = Command::new("bash")
         .arg("-c")
         .arg(command)
@@ -64,4 +67,8 @@ pub fn run_command_get_output(command: &str) -> String {
         );
     }
     String::new()
+}
+
+pub fn get_cores() -> u16 {
+    run_command_get_output("nproc").parse::<u16>().unwrap_or(16)
 }

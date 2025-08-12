@@ -19,7 +19,10 @@ pub fn copy_file(src: &str, dest: &str) -> Result<(), std::io::Error> {
     match std::fs::copy(&src, &dest) {
         Ok(_) => Ok(()),
         Err(e) => {
-            error!("Failed to copy file from \"{}\" to \"{}\", error: {:?}", &src, &dest, e);
+            error!(
+                "Failed to copy file from \"{}\" to \"{}\", error: {:?}",
+                &src, &dest, e
+            );
             Err(e)
         }
     }
@@ -52,7 +55,11 @@ pub fn mkdir_p(path: &str) {
 }
 
 pub fn dir_current() -> String {
-    env::current_dir().expect("Failed to get the current dir").to_str().unwrap().to_string()
+    env::current_dir()
+        .expect("Failed to get the current dir")
+        .to_str()
+        .unwrap()
+        .to_string()
 }
 
 pub fn set_var(key: &str, val: &str) {
@@ -61,3 +68,13 @@ pub fn set_var(key: &str, val: &str) {
     }
 }
 
+// With / at the end
+pub fn get_path_of_thing(thing: &TraitWrapper, options: &crate::Options) -> String {
+    format!(
+        "{}{}/{}{}/",
+        options.path_of_repo,
+        MAIN_BUILD_DIR,
+        thing.path(),
+        thing.name()
+    )
+}

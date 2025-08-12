@@ -40,7 +40,7 @@ RUN cd /tmp && \
     rm -rf /tmp/rkdeveloptool
 
 # Kernel
-RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-dev libmpfr-dev findutils perl
+RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-dev libmpfr-dev findutils perl bc zstd kmod
 
 # Binfmt
 RUN apt-get install -y qemu-user-static binfmt-support

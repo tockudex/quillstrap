@@ -9,11 +9,8 @@ impl AlpineChrootInstall {
     pub fn execute(options: &crate::Options, arguments: &str) {
         let thing = get_thing_by_name("alpine-chroot-install", &options.things);
         let path = format!(
-            "{}{}/{}{}/alpine-chroot-install",
-            options.path_of_repo,
-            MAIN_BUILD_DIR,
-            thing.path(),
-            thing.name()
+            "{}alpine-chroot-install",
+            get_path_of_thing(&thing, options)
         );
         let str = &format!("{} {}", path, arguments);
         info!("Running command: {}", str);

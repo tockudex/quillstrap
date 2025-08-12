@@ -17,7 +17,8 @@ impl SetupThing for InitRD {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec!["quill-init"]
+        // Also kernel repo for .commit
+        vec!["alpine-chroot-install"]
     }
 
     fn git(&self) -> &'static str {
@@ -84,8 +85,13 @@ impl SetupThing for InitRD {
         mkdir_p("opt/key");
         generate_public_key("opt/key/public.pem", options);
 
-        copy_file("../quill-init/out/qinit", "etc/init.d/qinit").unwrap();
-        copy_file("../quill-init/out/init", "sbin/init").unwrap();
+        // initrd_base is in kernel!
+        // copy_file("../quill-init/out/qinit", "etc/init.d/qinit").unwrap();
+        // copy_file("../quill-init/out/init", "sbin/init").unwrap();
+
+        let commit = Kernel::get_kernel_commit(options);
+        let mut file = File::create(".commit").unwrap();
+        file.write_all(commit.as_bytes()).unwrap();
 
         Ok(())
     }

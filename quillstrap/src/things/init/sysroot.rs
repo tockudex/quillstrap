@@ -9,15 +9,9 @@ impl Sysroot {
     pub fn execute_sysroot_command(command: &str, options: &crate::Options) {
         let cur_dir = dir_current();
         let thing = get_thing_by_name("sysroot", &options.things);
-        let path = &format!(
-            "{}{}/{}{}",
-            options.path_of_repo,
-            MAIN_BUILD_DIR,
-            thing.path(),
-            thing.name()
-        );
+        let path = &get_path_of_thing(&thing, options);
         // info!("Sysroot path: {}", path);
-        AlpineChrootInstall::turn_on_chroot(options, &format!("{}/", path));
+        AlpineChrootInstall::turn_on_chroot(options, path);
         dir_change(path);
         if !path_exists("quillstrap") || !is_mount_point("quillstrap") {
             mkdir_p("quillstrap");

@@ -1,6 +1,5 @@
 use crate::{
     prelude::*,
-    things::low::{backup::Backup, kernel::Kernel, rkbin::Rkbin, uboot::Uboot},
 };
 
 pub mod init;
@@ -11,12 +10,12 @@ pub enum TraitWrapper {
     TWUboot(Uboot),
     TWRkbin(Rkbin),
     TWBackup(Backup),
-    TWKernel(Kernel),
     TWQuillInit(QuillInit),
     TWSysroot(Sysroot),
     TWAlpineChrootInstall(AlpineChrootInstall),
     TWBranding(Branding),
     TWInitRD(InitRD),
+    TWKernel(Kernel),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -26,12 +25,12 @@ macro_rules! forward {
             TraitWrapper::TWUboot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWRkbin(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWBackup(inner) => inner.$method($($($arg),*)?),
-            TraitWrapper::TWKernel(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWQuillInit(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWSysroot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWAlpineChrootInstall(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWBranding(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWInitRD(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWKernel(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -85,6 +84,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TWAlpineChrootInstall(Default::default()),
         TWBranding(Default::default()),
         TWInitRD(Default::default()),
+        TWKernel(Default::default()),
     ]
 }
 
