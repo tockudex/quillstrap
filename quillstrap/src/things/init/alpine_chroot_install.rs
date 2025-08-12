@@ -30,7 +30,7 @@ impl AlpineChrootInstall {
         let chroot_dir_absolute = format!("{}/{}", dir_current(), chroot_dir);
         warn!("Chroot dir absolute is: {}", chroot_dir_absolute);
 
-        remove_dir_all(chroot_dir).unwrap();
+        remove_dir_all(chroot_dir).ok();
         AlpineChrootInstall::execute(
             options,
             &format!(

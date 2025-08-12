@@ -22,11 +22,11 @@ impl SetupThing for InitRD {
     }
 
     fn git(&self) -> &'static str {
-        todo!()
+        "initrd"
     }
 
     fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        mkdir_p(self.name());
+        git_get_manage(self, options);
         Ok(())
     }
 
@@ -36,7 +36,6 @@ impl SetupThing for InitRD {
 
     fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         let cur_dir = dir_current();
-        dir_change("../");
         // TODO: someone make this list smaller, not all is needed
         let package_vec: Vec<&str> = vec![
             "busybox",
@@ -64,12 +63,12 @@ impl SetupThing for InitRD {
         ];
         AlpineChrootInstall::setup_alpine_chroot(
             options,
-            &format!("{}", self.name()),
+            &format!("initrd_alpine"),
             package_vec,
             "aarch64",
         );
         // AlpineChrootInstall::turn_on_chroot(options, &format!("{}/", self.name()));
-        dir_change(&cur_dir);
+        dir_change("initrd_alpine");
 
         run_command(
             &format!("chmod 555 bin/bbsuid"),

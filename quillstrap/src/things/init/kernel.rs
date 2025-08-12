@@ -51,7 +51,7 @@ impl SetupThing for Kernel {
     }
 
     fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        remove_dir_all("initrd_base/lib/").ok();
+        remove_dir_all("../initrd/initrd_base/lib/").ok();
 
         copy_file("../quill-init/out/qinit", "initrd_base/etc/init.d/qinit").unwrap();
         copy_file("../quill-init/out/init", "initrd_base/sbin/init").unwrap();
