@@ -45,3 +45,6 @@ RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-de
 # Binfmt
 RUN apt-get install -y qemu-user-static binfmt-support
 RUN update-binfmts --enable
+
+# Expose eemc
+RUN apt-get install -y picocom lrzsz ckermit

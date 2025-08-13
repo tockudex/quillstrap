@@ -5,12 +5,6 @@ pub struct Rkbin {
     
 }
 
-impl Rkbin {
-    pub fn new() -> Self {
-        Rkbin {}
-    }
-}
-
 // https://github.com/PorQ-Pine/rkbin
 impl SetupThing for Rkbin {
     fn name(&self) -> &'static str {

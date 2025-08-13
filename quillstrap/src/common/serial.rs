@@ -122,3 +122,61 @@ pub fn read_serial(port: String, slice: &mut [u8]) {
         warn!("Serial read error: {:?}", err);
     }
 }
+
+use std::io::{self, Read};
+use std::sync::{mpsc, Arc};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::{Instant};
+
+pub fn send_read_serial(port: String, s: &str) -> String {
+    let (tx, rx) = mpsc::channel::<Vec<u8>>();
+    let stop = Arc::new(AtomicBool::new(false));
+    let stop_reader = stop.clone();
+    let port_clone = port.clone();
+
+    let reader = thread::spawn(move || {
+        let mut sp = match serialport::new(port_clone, DEFAULT_BAUDRATE)
+            .timeout(Duration::from_millis(50))
+            .open()
+        {
+            Ok(p) => p,
+            Err(_) => return,
+        };
+        let mut buf = [0u8; 1024];
+        while !stop_reader.load(Ordering::Relaxed) {
+            match sp.read(&mut buf) {
+                Ok(n) if n > 0 => { let _ = tx.send(buf[..n].to_vec()); }
+                Err(ref e) if e.kind() == io::ErrorKind::TimedOut => {}
+                Err(_) => break,
+                _ => {}
+            }
+        }
+    });
+
+    thread::sleep(Duration::from_millis(100));
+    send_serial_message(port.clone(), &format!("{}\n\r", s));
+
+    let mut out: Vec<u8> = Vec::new();
+    let idle = Duration::from_millis(500);
+    let overall = Duration::from_secs(5);
+    let start = Instant::now();
+    let mut last = Instant::now();
+    loop {
+        if Instant::now().duration_since(start) >= overall { break; }
+        match rx.recv_timeout(Duration::from_millis(50)) {
+            Ok(chunk) => { out.extend_from_slice(&chunk); last = Instant::now(); }
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                if Instant::now().duration_since(last) >= idle { break; }
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => break,
+        }
+    }
+
+    stop.store(true, Ordering::Relaxed);
+    let _ = reader.join();
+
+    let s = String::from_utf8_lossy(&out).to_string();
+    info!("Received from serial: {}", s);
+    s
+}

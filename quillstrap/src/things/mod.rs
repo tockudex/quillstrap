@@ -16,6 +16,7 @@ pub enum TraitWrapper {
     TWBranding(Branding),
     TWInitRD(InitRD),
     TWKernel(Kernel),
+    TWExposeMmc(ExposeMmc),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -31,6 +32,7 @@ macro_rules! forward {
             TraitWrapper::TWBranding(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWInitRD(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TWKernel(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TWExposeMmc(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -85,6 +87,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TWBranding(Default::default()),
         TWInitRD(Default::default()),
         TWKernel(Default::default()),
+        TWExposeMmc(Default::default()),
     ]
 }
 

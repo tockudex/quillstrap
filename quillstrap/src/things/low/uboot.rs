@@ -77,7 +77,7 @@ impl SetupThing for Uboot {
 
         // Clean the var
         set_var("CROSS_COMPILE", "");
-        let uboot_img_file = "U-boot.img";
+        let uboot_img_file = "uboot.img";
         if !path_exists(&uboot_img_file) {
             let err = format!(
                 "Failed to build U-boot, everything seems fine but output file {} is missing",
@@ -94,7 +94,7 @@ impl SetupThing for Uboot {
     fn deploy(&self, options: &Options) -> std::result::Result<(), String> {
         let todo = uboot_cli_rockusb(options).expect("Failed to enter rock usb mode");
 
-        if todo == ToRockUsbStatus::SkipAll {
+        if todo == UbootStuffStatus::SkipAll {
             warn!("ToRuckUSBStatus is skip all, we don't flash spl loader, uboot deploy just exits, we assume we are already there");
             return Ok(());
         }

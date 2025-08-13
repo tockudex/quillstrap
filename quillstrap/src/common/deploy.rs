@@ -1,32 +1,14 @@
 use crate::prelude::*;
 
 #[derive(PartialEq)]
-pub enum ToRockUsbStatus {
+pub enum UbootStuffStatus {
+    NotImportant,
     BootIntoSpl,
     SkipAll,
 }
 
-pub fn uboot_cli_rockusb(_options: &Options) -> Result<ToRockUsbStatus, ()> {
-    if get_serial_devices_native().is_empty() {
-        show_wait_toast("Please plug in the serial port to the pinenote and to the host");
-    }
-
-    let port = choose_serial_port();
-    info!("Serial port choosed: {}", port);
-
-    if port == "" {
-        warn!("No serial port selected, skipping the step of entering rockusb mode, lets say you are already there?");
-        return Ok(SkipAll);
-    }
-
-    let message = format!(
-        "Make sure U-boot serial cli is running.\nFirst reboot, then click the next button in the boot menu.\nThen use a command like \"tio -b 1500000 {}\" to enter the uboot cli.",
-        port
-    );
-    show_wait_toast(&message);
-
-    // Hehe
-    let _ = run_command("killall -9 tio", false);
+pub fn clear_uboot_cli(port: String) {
+    sleep_millis(100);
     for _ in 0..5 {
         send_serial_ascii(port.clone(), 0x03);
         sleep_millis(50);
@@ -37,6 +19,50 @@ pub fn uboot_cli_rockusb(_options: &Options) -> Result<ToRockUsbStatus, ()> {
         sleep_millis(50);
     }
     sleep_millis(100);
+}
+
+// String is port
+pub fn enter_uboot_cli() -> Result<(String, UbootStuffStatus), ()> {
+    if get_serial_devices_native().is_empty() {
+        show_wait_toast("Please plug in the serial port to the pinenote and to the host");
+    }
+
+    let port = choose_serial_port();
+    info!("Serial port choosed: {}", port);
+
+    if port == "" {
+        warn!(
+            "No serial port selected, skipping the step of entering uboot cli mode, lets say you were already there?"
+        );
+        return Ok((port.clone(), SkipAll));
+    }
+
+    let message = format!(
+        "Make sure U-boot serial cli is running.\nFirst reboot, then click the next button in the boot menu.\nThen use a command like \"tio -b 1500000 {}\" to enter the uboot cli.",
+        port
+    );
+    show_wait_toast(&message);
+
+    // Hehe
+    let _ = run_command("killall -9 tio", false);
+    clear_uboot_cli(port.clone());
+
+    let version = send_read_serial(port.clone(), "version");
+    if version.contains("U-Boot") {
+        info!("Uboot cli confirmed, yay");
+        return Ok((port.clone(), UbootStuffStatus::NotImportant));
+    } else {
+        error!("Failed to detect if we are in uboot cli");
+        Err(())
+    }
+}
+
+pub fn uboot_cli_rockusb(_options: &Options) -> Result<UbootStuffStatus, ()> {
+    let (port, status) = enter_uboot_cli().unwrap();
+
+    if status == SkipAll {
+        return Ok(SkipAll);
+    }
     send_serial_message(port.clone(), "rbrom\n\r");
     sleep_millis(1000);
 
@@ -74,7 +100,7 @@ pub fn rkdevelop_test(_options: &Options) -> Result<(), ()> {
     } else if str.contains("Flash Info:") {
         return Ok(());
     }
-    
+
     Err(())
 }
 
