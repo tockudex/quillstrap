@@ -52,11 +52,11 @@ impl SetupThing for ExposeMmc {
         let (port, status) = enter_uboot_cli().unwrap();
 
         // Kernel
-        let output = send_read_serial(port.clone(), "loady ${kernel_addr_r}");
+        let output = send_read_serial(port.clone(), "loadx ${kernel_addr_r}");
         if output.contains("Ready for binary (ymodem) download") {
             info!("Loading kernel now!");
             run_shell_command(
-                &format!("sz -vv -Y Image.gz --serial {}", port.clone()),
+                &format!("rmodem -f Image.gz -d {} -p xmodem -b 1500000", port.clone()),
                 options.config.command_output,
             )
             .unwrap();
@@ -67,11 +67,11 @@ impl SetupThing for ExposeMmc {
         clear_uboot_cli(port.clone());
 
         // DTB
-        let output = send_read_serial(port.clone(), "loady ${fdt_addr_r}");
+        let output = send_read_serial(port.clone(), "loadx ${fdt_addr_r}");
         if output.contains("Ready for binary (ymodem) download") {
             info!("Loading dtb now!");
             run_shell_command(
-                &format!("sz -vv -Y dtb --serial {}", port.clone()),
+                &format!("rmodem -f dtb -d {} -p xmodem -b 1500000", port.clone()),
                 options.config.command_output,
             )
             .unwrap();

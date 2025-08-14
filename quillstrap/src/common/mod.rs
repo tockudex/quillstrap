@@ -8,6 +8,7 @@ pub mod serial;
 pub mod deploy;
 pub mod mounts;
 pub mod signing;
+pub mod partitions;
 
 // TODO: make this show on the cli as a animation, then it dissapears
 pub fn sleep_millis(ms: u64) {
