@@ -51,12 +51,40 @@ impl SetupThing for ExposeMmc {
     fn deploy(&self, options: &Options) -> std::result::Result<(), String> {
         let (port, status) = enter_uboot_cli().unwrap();
 
+        // TODO: make error checks
+        send_read_serial(port.clone(), "mmc read ${kernel_addr_c} 0x35800 0x4000");
+        sleep_millis(1000);
+        clear_uboot_cli(port.clone());
+
+        send_read_serial(port.clone(), "mmc read ${fdt_addr_r} 0x39800 0x400");
+        sleep_millis(1000);
+        clear_uboot_cli(port.clone());
+
+        send_read_serial(port.clone(), "unzip ${kernel_addr_c} ${kernel_addr_r}");
+        sleep_millis(1000);
+        clear_uboot_cli(port.clone());
+
+        send_read_serial(port.clone(), "booti ${kernel_addr_r} - ${fdt_addr_r}");
+        sleep_millis(1000);
+        clear_uboot_cli(port.clone());
+
+        show_wait_toast("Now in theory, if you saw Waiting for USB to be plugged in, unplug the serial, plug in usb, the eemc should be exposed!");
+        Ok(())
+    }
+
+    fn run(&self) -> std::result::Result<(), String> {
+        Ok(())
+    }
+}
+
+/*
+// Xmodem way, never worked
         // Kernel
-        let output = send_read_serial(port.clone(), "loadx ${kernel_addr_r}");
-        if output.contains("Ready for binary (ymodem) download") {
+        let output = send_read_serial(port.clone(), "loadb ${kernel_addr_r}");
+        if output.contains("Ready for binary (xmodem) download") {
             info!("Loading kernel now!");
             run_shell_command(
-                &format!("rmodem -f Image.gz -d {} -p xmodem -b 1500000", port.clone()),
+                &format!("rmodem -f Image.gz -d {} -b 1500000", port.clone()),
                 options.config.command_output,
             )
             .unwrap();
@@ -67,11 +95,11 @@ impl SetupThing for ExposeMmc {
         clear_uboot_cli(port.clone());
 
         // DTB
-        let output = send_read_serial(port.clone(), "loadx ${fdt_addr_r}");
-        if output.contains("Ready for binary (ymodem) download") {
+        let output = send_read_serial(port.clone(), "loadb ${fdt_addr_r}");
+        if output.contains("Ready for binary (xmodem) download") {
             info!("Loading dtb now!");
             run_shell_command(
-                &format!("rmodem -f dtb -d {} -p xmodem -b 1500000", port.clone()),
+                &format!("rmodem -f dtb -d {} -b 1500000", port.clone()),
                 options.config.command_output,
             )
             .unwrap();
@@ -96,10 +124,4 @@ impl SetupThing for ExposeMmc {
         show_wait_toast(
             "Maybe it worked, maybe not, unplug serial, plug in normally, there should be another block device",
         );
-        Ok(())
-    }
-
-    fn run(&self) -> std::result::Result<(), String> {
-        Ok(())
-    }
-}
+*/

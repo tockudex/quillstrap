@@ -1,3 +1,5 @@
+use std::env::current_dir;
+
 use crate::prelude::*;
 
 #[derive(Clone, Copy, Default)]
@@ -20,7 +22,7 @@ impl SetupThing for Uboot {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec!["rkbin"]
+        vec!["rkbin", "backup_mmc"]
     }
 
     fn git(&self) -> &'static str {
@@ -95,7 +97,9 @@ impl SetupThing for Uboot {
         let todo = uboot_cli_rockusb(options).expect("Failed to enter rock usb mode");
 
         if todo == UbootStuffStatus::SkipAll {
-            warn!("ToRuckUSBStatus is skip all, we don't flash spl loader, uboot deploy just exits, we assume we are already there");
+            warn!(
+                "ToRuckUSBStatus is skip all, we don't flash spl loader, uboot deploy just exits, we assume we are already there"
+            );
             return Ok(());
         }
         /*
@@ -150,6 +154,23 @@ impl SetupThing for Uboot {
             options.config.command_output,
         )
         .expect("Failed to write logo partition");
+
+        let cur_dir = dir_current();
+        dir_change("../expose_mmc");
+        info!("Running rkdeveloptool write 0x35800 Image.gz");
+        run_command(
+            "rkdeveloptool write 0x35800 Image.gz",
+            options.config.command_output,
+        )
+        .expect("Failed to write logo partition");
+
+        info!("Running rkdeveloptool write 0x39800 dtb");
+        run_command(
+            "rkdeveloptool write 0x39800 dtb",
+            options.config.command_output,
+        )
+        .expect("Failed to write logo partition");
+        dir_change(&cur_dir);
 
         Ok(())
     }

@@ -47,4 +47,5 @@ RUN apt-get install -y qemu-user-static binfmt-support
 RUN update-binfmts --enable
 
 # Expose eemc & Backup mmc
-RUN apt-get install -y picocom lrzsz ckermit qemu-utils
+# Some of those are not needed but whatever
+RUN apt-get install -y picocom lrzsz ckermit qemu-utils expect parted
