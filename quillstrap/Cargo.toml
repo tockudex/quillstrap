@@ -23,3 +23,6 @@ dialoguer = "0.11.0"
 # Remote
 reqwest = { version = "0.12.22", features = ["blocking"] }
 serialport = "4.7.2"
+
+# Disk
+regex = "1.11.1"

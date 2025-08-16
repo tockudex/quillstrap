@@ -1248,6 +1248,7 @@ dependencies = [
  "git2",
  "log",
  "openssl",
+ "regex",
  "reqwest",
  "ron",
  "serde",

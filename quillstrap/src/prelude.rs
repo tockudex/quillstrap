@@ -21,6 +21,7 @@ pub use crate::things::init::initrd::*;
 pub use crate::things::init::quill_init::*;
 pub use crate::things::init::sysroot::*;
 pub use crate::things::init::kernel::*;
+pub use crate::things::init::partition_setup::*;
 pub use crate::things::low::{backup::Backup, rkbin::Rkbin, uboot::Uboot, expose_mmc::*, backup_mmc::*};
 pub use crate::things::*;
 pub use color_eyre::eyre::Result;
