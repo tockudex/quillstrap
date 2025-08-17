@@ -215,7 +215,9 @@ pub fn resize_partition(label: &str, size_mb: usize) {
     run_shell_command(
         &format!(
             "echo Yes | parted {} ---pretend-input-tty unit s resizepart {} {}",
-            disk, part_number, start + new_size
+            disk,
+            part_number,
+            start + new_size
         ),
         true,
     )
@@ -253,3 +255,32 @@ pub fn resize_partition(label: &str, size_mb: usize) {
     )
     .unwrap();
 */
+
+pub fn create_partition(after_label: &str, size_mb: usize, new_label: &str) {
+    let previous_partition = get_partition(after_label);
+    let (disk, _previous_part_number) = get_disk_part_numb(&previous_partition);
+    let (previous_start, previous_size) = get_sectors(&previous_partition);
+    let new_start = previous_start + previous_size;
+    let new_size = (size_mb * 1024 * 1024) / BLOCK_SIZE;
+    let new_end = new_start + new_size;
+    run_shell_command(
+        &format!(
+            "echo Yes | parted --align optimal -s {} unit s mkpart {} ext4 {} {}",
+            disk, new_label, new_start, new_end
+        ),
+        true,
+    )
+    .unwrap();
+
+    sleep_millis(500);
+    run_command(&format!("partprobe {}", disk), true).unwrap();
+    sleep_millis(500);
+
+    sleep_millis(500);
+    run_command(&format!("mkfs.ext4 {}", get_partition(new_label)), true).unwrap();
+    sleep_millis(500);
+
+    sleep_millis(500);
+    run_command(&format!("partprobe {}", disk), true).unwrap();
+    sleep_millis(500);
+}

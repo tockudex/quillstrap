@@ -63,6 +63,12 @@ impl SetupThing for PartitionSetup {
             "os2",
             "data",
         ];
+        // Well, we assume here no one has this naming
+        show_wait_toast(&format!(
+            "Please confirm none of your partitions on your device have these names in the gpt partition table: {}",
+            good_partitions.join(", ")
+        ));
+
         for i in 0..7 {
             let label_expected = good_partitions[i];
             let label = get_partition_label(&partitions[i]);
@@ -80,11 +86,17 @@ impl SetupThing for PartitionSetup {
 
         // Aaaa why
         run_command(&format!("sgdisk -e {}", disk), true).unwrap();
+        // Someone send help
         sleep_millis(2000);
 
-        remove_partition("os2"); 
+        remove_partition("os2");
         move_partition_left("data");
         resize_partition("data", 10 * 1024);
+
+        create_partition("data", 256, "quill_boot");
+        create_partition("quill_boot", 1024 * 10, "quill_recovery");
+        create_partition("quill_recovery", 1024 * 80, "quill_main");
+
         Ok(())
     }
 }
