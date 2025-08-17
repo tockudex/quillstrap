@@ -4,6 +4,10 @@ use std::io;
 use std::process::{Command, Stdio};
 
 pub fn run_command(command: &str, show_output: bool) -> io::Result<()> {
+    if show_output {
+        info!("Executing \"{}\" in shell", command);
+    }
+
     let mut parts = command.split_whitespace();
     if let Some(program) = parts.next() {
         let args: Vec<&str> = parts.collect();
@@ -28,8 +32,9 @@ pub fn run_command(command: &str, show_output: bool) -> io::Result<()> {
 
 pub fn run_shell_command(command: &str, show_output: bool) -> io::Result<()> {
     if show_output {
-        info!("Executing {} in shell", command);
+        info!("Executing \"{}\" in shell", command);
     }
+    
     let mut child = Command::new("bash")
         .arg("-c")
         .arg(command)

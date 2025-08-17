@@ -49,7 +49,6 @@ impl SetupThing for PartitionSetup {
         info!("Look:");
         run_command(&format!("gdisk -l {}", disk), true).unwrap();
 
-        /*
         let partitions = get_disk_partitions(&disk);
         if partitions.len() != 7 {
             panic!("Wrong partition count, this is not the default partition set up, aborting");
@@ -79,9 +78,13 @@ impl SetupThing for PartitionSetup {
 
         info!("This is the default expected partition set, good");
 
-        remove_partition("os2");
-         */
-        resize_partition("data", 10 * 1000);
+        // Aaaa why
+        run_command(&format!("sgdisk -e {}", disk), true).unwrap();
+        sleep_millis(2000);
+
+        remove_partition("os2"); 
+        move_partition_left("data");
+        resize_partition("data", 10 * 1024);
         Ok(())
     }
 }

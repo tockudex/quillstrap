@@ -26,3 +26,4 @@ serialport = "4.7.2"
 
 # Disk
 regex = "1.11.1"
+gptman = "2.0.1"

@@ -2,6 +2,8 @@ use std::process::Command;
 
 use crate::prelude::*;
 
+const BLOCK_SIZE: usize = 512;
+
 pub fn choose_disk() -> String {
     let output = Command::new("lsblk")
         .arg("-ndo")
@@ -94,6 +96,18 @@ pub fn get_partition(label: &str) -> String {
         .unwrap()
 }
 
+// TODO: hacky, idk if it will work always
+// outputs for example /dev/sda2
+pub fn get_partition_by_numb(disk: &str, part_number: usize) -> String {
+    if let Some(last_char) = disk.chars().last() {
+        if last_char.is_numeric() {
+            return format!("{}p{}", disk, part_number);
+        }
+    }
+
+    format!("{}{}", disk, part_number)
+}
+
 use regex::Regex;
 // Receives /dev/sda2
 pub fn get_disk_part_numb(partition: &str) -> (String, u16) {
@@ -107,6 +121,32 @@ pub fn get_disk_part_numb(partition: &str) -> (String, u16) {
         .unwrap()
 }
 
+// Receives /dev/sda2
+// Outputs start / size in sectors
+pub fn get_sectors(partition: &str) -> (usize, usize) {
+    let (disk, part_number) = get_disk_part_numb(partition);
+    let mut start_str = read_file_str(format!(
+        "/sys/block/{}/{}/start",
+        disk.replace("/dev/", "").replace("/", "/"),
+        partition.replace("/dev/", "").replace("/", "/")
+    ))
+    .unwrap();
+    start_str = start_str.replace("\n", "");
+    // info!("Got start str: {}", start_str);
+    let start = start_str.parse::<usize>().unwrap();
+
+    let size = read_file_str(format!(
+        "/sys/block/{}/{}/size",
+        disk.replace("/dev/", "").replace("/", "/"),
+        partition.replace("/dev/", "").replace("/", "/")
+    ))
+    .unwrap()
+    .replace("\n", "")
+    .parse::<usize>()
+    .unwrap();
+    (start, size)
+}
+
 // accepts labels
 pub fn remove_partition(label: &str) {
     let (disk, part_number) = get_disk_part_numb(&get_partition(label));
@@ -117,29 +157,99 @@ pub fn remove_partition(label: &str) {
     run_command(&format!("parted {} -s rm {}", disk, part_number), true).unwrap();
 }
 
+pub fn move_partition_left(label: &str) {
+    let partition = get_partition(label);
+    let (disk, part_number) = get_disk_part_numb(&partition);
+
+    show_wait_toast(&format!(
+        "Resize partition of label: {} of number: {} in disk: {} to the left",
+        label, part_number, disk
+    ));
+
+    let mut c = 1;
+    let mut previous_partition = get_partition_by_numb(&disk, (part_number - c) as usize);
+    while !path_exists(&previous_partition) {
+        c = c + 1;
+        previous_partition = get_partition_by_numb(&disk, (part_number - c) as usize);
+    }
+    info!("Final previous partition is: {}", previous_partition);
+
+    let (previous_start, previous_size) = get_sectors(&previous_partition);
+    let (_start, size) = get_sectors(&partition);
+    let new_start_sector = previous_start + previous_size + 1;
+    let _new_end_sector = new_start_sector + size;
+    run_shell_command(
+        &format!(
+            "echo '{},{}' | sfdisk --move-data {} -N {}",
+            new_start_sector, size, disk, part_number
+        ),
+        true,
+    )
+    .unwrap();
+
+    run_command(&format!("e2fsck -f -y -v -C 0 {}", &partition), true).unwrap();
+
+    // sudo parted --script /dev/sdX unit s move <PARTITION_NUMBER> <NEW_START_SECTOR> <NEW_END_SECTOR>
+}
+
 // mb are *1000 from gb!
 // only ext4
-pub fn resize_partition(label: &str, size_mb: u16) {
-    let (disk, part_number) = get_disk_part_numb(&get_partition(label));
+pub fn resize_partition(label: &str, size_mb: usize) {
+    let partition = get_partition(label);
+    let (disk, part_number) = get_disk_part_numb(&partition);
+
     show_wait_toast(&format!(
         "Resize partition of label: {} number: {} in disk: {} to size {}M",
         label, part_number, disk, size_mb
     ));
+
+    info!("Running e2fsck");
+    run_command(&format!("e2fsck -f -y -C 0 {}", &partition), true).unwrap();
+
+    info!("Running resize2fs");
+    run_command(&format!("resize2fs -p {} {}M", &partition, size_mb), true).unwrap();
+
+    info!("Running parted");
+    let (start, _size) = get_sectors(&partition);
+    let new_size = (size_mb * 1024 * 1024) / BLOCK_SIZE;
+    run_shell_command(
+        &format!(
+            "echo Yes | parted {} ---pretend-input-tty unit s resizepart {} {}",
+            disk, part_number, start + new_size
+        ),
+        true,
+    )
+    .unwrap();
+
+    info!("Running partprobe");
+    run_command(&format!("partprobe {}", disk), true).unwrap();
+
+    info!("Running e2fsck");
+    run_command(&format!("e2fsck -f -y -C 0 {}", &partition), true).unwrap();
+}
+
+/*
+// For resizing, nope
+    run_command(
+        &format!("e2fsck -f -y -C 0 {}", get_partition(label)),
+        true,
+    )
+    .unwrap();
+
+    let (start, _size) = get_sectors(&get_partition(label));
+    let new_size = (size_mb * 1024 * 1024) / BLOCK_SIZE;
+    run_shell_command(
+        &format!(
+            "echo '{},{}' | sfdisk --move-data {} -N {}",
+            start, new_size, disk, part_number
+        ),
+        true,
+    )
+    .unwrap();
 
     run_command(
         &format!("e2fsck -f -y -v -C 0 {}", get_partition(label)),
         true,
     )
     .unwrap();
-    run_command(
-        &format!("parted -s {} resizepart {} {}M", disk, part_number, size_mb),
-        true,
-    )
-    .unwrap();
-    run_command(
-        &format!("e2fsck -f -y -v -C 0 {}", get_partition(label)),
-        true,
-    )
-    .unwrap();
-    run_command(&format!("resize2fs -p {}", get_partition(label)), true).unwrap();
-}
+*/
