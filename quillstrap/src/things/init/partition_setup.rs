@@ -97,6 +97,9 @@ impl SetupThing for PartitionSetup {
         create_partition("quill_boot", 1024 * 10, "quill_recovery");
         create_partition("quill_recovery", 1024 * 80, "quill_main");
 
+        run_command(&format!("sfdisk -r {}", disk), true).unwrap();
+        sleep_millis(200);
+
         Ok(())
     }
 }

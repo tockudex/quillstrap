@@ -257,6 +257,11 @@ pub fn resize_partition(label: &str, size_mb: usize) {
 */
 
 pub fn create_partition(after_label: &str, size_mb: usize, new_label: &str) {
+    show_wait_toast(&format!(
+        "Create partition after label: {} size: {}M new_label {}",
+        after_label, size_mb, new_label
+    ));
+
     let previous_partition = get_partition(after_label);
     let (disk, _previous_part_number) = get_disk_part_numb(&previous_partition);
     let (previous_start, previous_size) = get_sectors(&previous_partition);
