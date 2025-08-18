@@ -19,6 +19,8 @@ pub enum TraitWrapper {
     TWExposeMmc(ExposeMmc),
     TwBackupMmc(BackupMmc),
     TwParitionSetup(PartitionSetup),
+    TwBootPartition(BootPartition),
+    TwFirmware(Firmware),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -37,6 +39,8 @@ macro_rules! forward {
             TraitWrapper::TWExposeMmc(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwBackupMmc(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwParitionSetup(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwBootPartition(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwFirmware(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -94,6 +98,8 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TWExposeMmc(Default::default()),
         TwBackupMmc(Default::default()),
         TwParitionSetup(Default::default()),
+        TwBootPartition(Default::default()),
+        TwFirmware(Default::default()),
     ]
 }
 

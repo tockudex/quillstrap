@@ -5,3 +5,5 @@ pub mod branding;
 pub mod initrd;
 pub mod kernel;
 pub mod partition_setup;
+pub mod boot_partition;
+pub mod firmware;

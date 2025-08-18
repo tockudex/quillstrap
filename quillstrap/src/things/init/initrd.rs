@@ -93,6 +93,7 @@ impl SetupThing for InitRD {
         let mut file = File::create(".commit").unwrap();
         file.write_all(commit.as_bytes()).unwrap();
 
+        dir_change(&cur_dir);
         Ok(())
     }
 

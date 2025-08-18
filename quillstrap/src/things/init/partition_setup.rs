@@ -13,7 +13,7 @@ impl SetupThing for PartitionSetup {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec![]
+        vec!["expose_mmc"]
     }
 
     fn git(&self) -> &'static str {
