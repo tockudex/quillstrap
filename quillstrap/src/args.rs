@@ -20,7 +20,7 @@ pub struct Args {
     pub auto_mode: bool,
     #[arg(
         short,long,
-        help = "Things to get (or check for updates), seperated by space",
+        help = "Things to get (or check for updates), seperated by space. Possible all option",
         num_args = 1..,
     )]
     // Order is important in those vecs!
@@ -49,7 +49,7 @@ pub struct Args {
 
 impl Args {
     pub fn parse_validate() -> Self {
-        let args = Args::parse();
+        let mut args = Args::parse();
         debug!("Initial args structure: {:#?}", args);
 
         // TODO: this is cool https://crates.io/crates/human-panic
@@ -68,6 +68,13 @@ impl Args {
             && args.run.is_none()
         {
             panic!("No action selected to be done!");
+        }
+
+        if args.get.len() == 1 && args.get[0] == "all" {
+            args.get.clear();
+            for thing in get_things() {
+                args.get.push(thing.name().to_string());
+            }
         }
 
         args
