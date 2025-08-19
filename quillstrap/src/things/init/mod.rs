@@ -7,3 +7,4 @@ pub mod kernel;
 pub mod partition_setup;
 pub mod boot_partition;
 pub mod firmware;
+pub mod eink_kernel_magic;

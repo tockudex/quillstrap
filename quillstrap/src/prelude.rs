@@ -24,6 +24,7 @@ pub use crate::things::init::kernel::*;
 pub use crate::things::init::partition_setup::*;
 pub use crate::things::init::boot_partition::*;
 pub use crate::things::init::firmware::*;
+pub use crate::things::init::eink_kernel_magic::*;
 pub use crate::things::low::{backup::Backup, rkbin::Rkbin, uboot::Uboot, expose_mmc::*, backup_mmc::*};
 pub use crate::things::*;
 pub use color_eyre::eyre::Result;

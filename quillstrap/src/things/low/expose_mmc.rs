@@ -68,7 +68,14 @@ impl SetupThing for ExposeMmc {
         sleep_millis(1000);
         clear_uboot_cli(port.clone());
 
-        show_wait_toast("Now in theory, if you saw Waiting for USB to be plugged in, unplug the serial, plug in usb, the eemc should be exposed!");
+        show_wait_toast(
+            "Now in theory, if you saw Waiting for USB to be plugged in, unplug the serial, plug in usb, the eemc should be exposed!",
+        );
+
+        show_wait_toast(
+            "Make sure no partitions on another disk have the same labels as the one on the pinenote!",
+        );
+
         Ok(())
     }
 

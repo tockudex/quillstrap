@@ -49,3 +49,6 @@ RUN update-binfmts --enable
 # Expose eemc & Backup mmc
 # Some of those are not needed but whatever
 RUN apt-get install -y picocom lrzsz ckermit qemu-utils expect parted fdisk
+
+# Eink kernel magic
+RUN apt-get install -y python3-numpy

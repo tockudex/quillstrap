@@ -13,7 +13,7 @@ impl SetupThing for Backup {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec!["uboot"]
+        vec!["expose_mmc"]
     }
 
     fn git(&self) -> &'static str {
@@ -42,25 +42,22 @@ impl SetupThing for Backup {
     }
 
     fn run(&self) -> color_eyre::eyre::Result<(), String> {
-        warn!("We assume because of uboot deploy, we are in rkdeveloptool state");
+        warn!("We assume because of expose_mmc deploy, the mmc is exposed as a block device");
 
-        run_command("rkdeveloptool read-partition uboot uboot.bin", true)
-            .expect("Failed to read partition");
-        run_command("rkdeveloptool read-partition waveform waveform.bin", true)
-            .expect("Failed to read partition");
-        run_command("rkdeveloptool read-partition uboot_env uboot_env.bin", true)
-            .expect("Failed to read partition");
-        run_command("rkdeveloptool read-partition logo logo.bin", true)
-            .expect("Failed to read partition");
+        let disk = choose_disk();
+        info!("Choosed disk: {}", disk);
 
         let partitions = vec!["uboot", "waveform", "uboot_env", "logo"];
         let mut wrong = false;
-        for part in partitions {
-            run_command(&format!("rkdeveloptool read-partition {} {}.bin", part, part), true)
-                .expect(&format!("Failed to read partition: {}", part));
+        for label in partitions {
+            let partition = get_partition(label);
+            run_shell_command(&format!("dd if={} of={}.bin bs=512 status=progress", partition, label), true).unwrap();
 
-            if !path_exists(&format!("{}.bin", part)) {
-                error!("File doesn't exist: {}.bin - we have a problem probably, the backup is bad!", part);
+            if !path_exists(&format!("{}.bin", label)) {
+                error!(
+                    "File doesn't exist: {}.bin - we have a problem probably, the backup is bad!",
+                    label
+                );
                 wrong = true;
             }
         }
@@ -74,3 +71,19 @@ impl SetupThing for Backup {
         Ok(())
     }
 }
+
+/*
+spl boot doesn't support reads it seems?
+
+warn!("We assume because of uboot deploy, we are in rkdeveloptool state");
+
+        run_command("rkdeveloptool read-partition uboot uboot.bin", true)
+            .expect("Failed to read partition");
+        run_command("rkdeveloptool read-partition waveform waveform.bin", true)
+            .expect("Failed to read partition");
+        run_command("rkdeveloptool read-partition uboot_env uboot_env.bin", true)
+            .expect("Failed to read partition");
+        run_command("rkdeveloptool read-partition logo logo.bin", true)
+            .expect("Failed to read partition");
+
+*/

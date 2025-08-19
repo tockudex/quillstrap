@@ -13,7 +13,7 @@ impl SetupThing for BootPartition {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        // Initrd, firmware
+        // Initrd, firmware, eink_kernel_magic
         vec!["expose_mmc", "partition_setup"]
     }
 
@@ -48,6 +48,9 @@ impl SetupThing for BootPartition {
 
         copy_file("../firmware/wifi_bt/firmware.squashfs", "/mnt/quill_boot/firmware.squashfs").unwrap();
         sign("/mnt/quill_boot/firmware.squashfs", "/mnt/quill_boot/firmware.squashfs.dgst", options);
+
+        mkdir_p("/mnt/quill_boot/waveform");
+        copy_file("../eink_kernel_magic/custom_wf.bin", "/mnt/quill_boot/waveform/custom_wf.bin").unwrap();
 
         run_command("sync", false).unwrap();
         run_command(&format!("umount {}", partition), options.config.command_output).unwrap();

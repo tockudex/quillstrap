@@ -61,12 +61,16 @@ impl SetupThing for InitRD {
             "openresolv",
             "gocryptfs",
         ];
-        AlpineChrootInstall::setup_alpine_chroot(
-            options,
-            &format!("initrd_alpine"),
-            package_vec,
-            "aarch64",
-        );
+
+        if !path_exists("initrd_alpine") {
+            AlpineChrootInstall::setup_alpine_chroot(
+                options,
+                &format!("initrd_alpine"),
+                package_vec,
+                "aarch64",
+            );
+        }
+
         // AlpineChrootInstall::turn_on_chroot(options, &format!("{}/", self.name()));
         dir_change("initrd_alpine");
 

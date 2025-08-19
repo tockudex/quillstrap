@@ -21,6 +21,7 @@ pub enum TraitWrapper {
     TwParitionSetup(PartitionSetup),
     TwBootPartition(BootPartition),
     TwFirmware(Firmware),
+    TwEinkKernelMagic(EinkKernelMagic),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -41,6 +42,7 @@ macro_rules! forward {
             TraitWrapper::TwParitionSetup(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwBootPartition(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwFirmware(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwEinkKernelMagic(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -100,6 +102,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwParitionSetup(Default::default()),
         TwBootPartition(Default::default()),
         TwFirmware(Default::default()),
+        TwEinkKernelMagic(Default::default()),
     ]
 }
 
