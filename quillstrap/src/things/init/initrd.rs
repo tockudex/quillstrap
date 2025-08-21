@@ -60,6 +60,7 @@ impl SetupThing for InitRD {
             "iwd",
             "openresolv",
             "gocryptfs",
+            "tzdata",
         ];
 
         if !path_exists("initrd_alpine") {
