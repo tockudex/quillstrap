@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::{fs::remove_dir_all, io::Write};
 
 use crate::prelude::*;
 
@@ -31,7 +31,8 @@ impl SetupThing for InitRD {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
-        todo!()
+        remove_dir_all("initrd_alpine").ok();
+        Ok(())
     }
 
     fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
@@ -86,6 +87,8 @@ impl SetupThing for InitRD {
         remove_file(format!("enter-chroot")).ok();
         remove_file(format!("etc/motd")).ok();
         remove_file(format!("etc/resolv.conf")).ok();
+
+        remove_dir_all("var/cache").ok();
 
         mkdir_p("opt/key");
         generate_public_key("opt/key/public.pem", options);
