@@ -60,7 +60,7 @@ impl Config {
                 Ok(conf) => {
                     if Path::new(CONFIG_PATH_FRESH).exists() {
                         warn!("Config file is good but fresh exists, I will remove fresh");
-                        let _ = remove_file(CONFIG_PATH_FRESH.to_string());
+                        let _ = remove_file(CONFIG_PATH_FRESH);
                     }
                     return conf;},
                 Err(err) => {

@@ -83,11 +83,11 @@ impl SetupThing for InitRD {
         )
         .unwrap();
 
-        remove_file(format!("env.sh")).ok();
-        remove_file(format!("destroy")).ok();
-        remove_file(format!("enter-chroot")).ok();
-        remove_file(format!("etc/motd")).ok();
-        remove_file(format!("etc/resolv.conf")).ok();
+        remove_file(&format!("env.sh")).ok();
+        remove_file(&format!("destroy")).ok();
+        remove_file(&format!("enter-chroot")).ok();
+        remove_file(&format!("etc/motd")).ok();
+        remove_file(&format!("etc/resolv.conf")).ok();
 
         remove_dir_all("var/cache").ok();
 

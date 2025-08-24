@@ -22,20 +22,18 @@ impl SetupThing for ExposeMmc {
         todo!()
     }
 
-    fn get(&self, options: &Options) -> std::result::Result<(), String> {
+    fn get(&self, _options: &Options) -> std::result::Result<(), String> {
         remove_dir_all(self.name()).ok();
         mkdir_p(self.name());
         dir_change(self.name());
-        run_command(
-            "wget https://github.com/PorQ-Pine/initrd/releases/download/1/Image.gz",
-            options.config.command_output,
-        )
-        .unwrap();
-        run_command(
-            "wget https://github.com/PorQ-Pine/initrd/releases/download/1/dtb",
-            options.config.command_output,
-        )
-        .unwrap();
+        download_file(
+            "https://github.com/PorQ-Pine/initrd/releases/download/1/Image.gz",
+            "Image.gz",
+        );
+        download_file(
+            "https://github.com/PorQ-Pine/initrd/releases/download/1/dtb",
+            "dtb",
+        );
         dir_change("../");
         Ok(())
     }

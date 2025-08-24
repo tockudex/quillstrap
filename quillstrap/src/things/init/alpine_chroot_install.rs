@@ -6,13 +6,13 @@ use crate::prelude::*;
 pub struct AlpineChrootInstall;
 
 impl AlpineChrootInstall {
-    pub fn execute(_options: &crate::Options, arguments: &str) {
+    pub fn execute(_options: &crate::Options, command: &str) {
         let thing = get_thing_by_name("alpine-chroot-install", &_options.things);
         let path = format!(
             "{}alpine-chroot-install",
             get_path_of_thing(&thing, _options)
         );
-        let str = &format!("{} {}", path, arguments);
+        let str = &format!("{} {}", path, command);
         info!("Running command: {}", str);
         run_command(str, _options.config.command_output)
             .expect("Failed to run alpine-chroot-install");
@@ -43,7 +43,7 @@ impl AlpineChrootInstall {
         umount_recursive(chroot_dir);
     }
 
-    // Dir, with / at the end. It's the path to the actual sysroot, not sysroot and usr next to it
+    // Dir, with / at the end. It's the path to the actual sysroot
     pub fn turn_on_chroot(_options: &crate::Options, dir: &str) {
         // let thing = get_thing_by_name("alpine-chroot-install", &_options.things);
         mount_point(&format!("{}proc", dir), "proc");

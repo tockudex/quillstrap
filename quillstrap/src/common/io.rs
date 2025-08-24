@@ -28,8 +28,8 @@ pub fn copy_file(src: &str, dest: &str) -> Result<(), std::io::Error> {
     }
 }
 
-pub fn remove_file(path: String) -> Result<(), std::io::Error> {
-    match std::fs::remove_file(path.clone()) {
+pub fn remove_file(path: &str) -> Result<(), std::io::Error> {
+    match std::fs::remove_file(path) {
         Ok(_) => Ok(()),
         Err(e) => {
             error!(
