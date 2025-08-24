@@ -1,6 +1,5 @@
 use std::{
-    env,
-    path::Path,
+    env, fs::remove_dir_all, path::Path
 };
 
 use crate::prelude::*;
@@ -54,6 +53,11 @@ pub fn mkdir_p(path: &str) {
     std::fs::create_dir_all(dir).expect(&format!("Failed to create dir at: {}", path));
 }
 
+pub fn clean_dir(path: &str) {
+    remove_dir_all(path).unwrap();
+    mkdir_p(path);
+}
+
 pub fn dir_current() -> String {
     env::current_dir()
         .expect("Failed to get the current dir")
@@ -68,13 +72,8 @@ pub fn set_var(key: &str, val: &str) {
     }
 }
 
-// With / at the end
-pub fn get_path_of_thing(thing: &TraitWrapper, options: &crate::Options) -> String {
-    format!(
-        "{}{}/{}{}/",
-        options.path_of_repo,
-        MAIN_BUILD_DIR,
-        thing.path(),
-        thing.name()
-    )
+pub fn replace_string_file(file: &str, str_to_replace: &str, replace_with: &str) {
+    let content = std::fs::read_to_string(file).unwrap();
+    let new_content = content.replace(str_to_replace, replace_with);
+    std::fs::write(file, new_content).unwrap();
 }

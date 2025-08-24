@@ -1,3 +1,4 @@
+use crate::prelude::*;
 use std::{thread, time};
 
 pub mod cli;
@@ -15,4 +16,15 @@ pub mod network;
 pub fn sleep_millis(ms: u64) {
     let ten_millis = time::Duration::from_millis(ms);
     thread::sleep(ten_millis);
+}
+
+// With / at the end
+pub fn get_path_of_thing(thing: &TraitWrapper, options: &crate::Options) -> String {
+    format!(
+        "{}{}/{}{}/",
+        options.path_of_repo,
+        MAIN_BUILD_DIR,
+        thing.path(),
+        thing.name()
+    )
 }
