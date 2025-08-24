@@ -1,4 +1,4 @@
-use std::{env::current_dir, fs::remove_dir_all};
+use std::fs::remove_dir_all;
 
 use crate::prelude::*;
 

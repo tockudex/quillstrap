@@ -1,6 +1,6 @@
 use std::{
     env,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use crate::prelude::*;
