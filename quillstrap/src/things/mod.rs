@@ -4,6 +4,7 @@ use crate::{
 
 pub mod init;
 pub mod low;
+pub mod os;
 
 #[derive(Clone, Copy)]
 pub enum TraitWrapper {
@@ -22,6 +23,7 @@ pub enum TraitWrapper {
     TwBootPartition(BootPartition),
     TwFirmware(Firmware),
     TwEinkKernelMagic(EinkKernelMagic),
+    TwRootfs(Rootfs),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -43,6 +45,7 @@ macro_rules! forward {
             TraitWrapper::TwBootPartition(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwFirmware(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwEinkKernelMagic(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwRootfs(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -103,6 +106,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwBootPartition(Default::default()),
         TwFirmware(Default::default()),
         TwEinkKernelMagic(Default::default()),
+        TwRootfs(Default::default()),
     ]
 }
 
