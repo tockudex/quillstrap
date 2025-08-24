@@ -25,8 +25,8 @@ impl SetupThing for InitRD {
         "initrd"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, _options);
         Ok(())
     }
 
@@ -35,7 +35,7 @@ impl SetupThing for InitRD {
         Ok(())
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         let cur_dir = dir_current();
         // TODO: someone make this list smaller, not all is needed
         let package_vec: Vec<&str> = vec![
@@ -67,19 +67,19 @@ impl SetupThing for InitRD {
 
         if !path_exists("initrd_alpine") {
             AlpineChrootInstall::setup_alpine_chroot(
-                options,
+                _options,
                 &format!("initrd_alpine"),
                 package_vec,
                 "aarch64",
             );
         }
 
-        // AlpineChrootInstall::turn_on_chroot(options, &format!("{}/", self.name()));
+        // AlpineChrootInstall::turn_on_chroot(_options, &format!("{}/", self.name()));
         dir_change("initrd_alpine");
 
         run_command(
             &format!("chmod 555 bin/bbsuid"),
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
 
@@ -92,13 +92,13 @@ impl SetupThing for InitRD {
         remove_dir_all("var/cache").ok();
 
         mkdir_p("opt/key");
-        generate_public_key("opt/key/public.pem", options);
+        generate_public_key("opt/key/public.pem", _options);
 
         // initrd_base is in kernel!
         // copy_file("../quill-init/out/qinit", "etc/init.d/qinit").unwrap();
         // copy_file("../quill-init/out/init", "sbin/init").unwrap();
 
-        let commit = Kernel::get_kernel_commit(options);
+        let commit = Kernel::get_kernel_commit(_options);
         let mut file = File::create(".commit").unwrap();
         file.write_all(commit.as_bytes()).unwrap();
 
@@ -106,7 +106,7 @@ impl SetupThing for InitRD {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

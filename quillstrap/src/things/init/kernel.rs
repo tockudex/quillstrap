@@ -6,14 +6,14 @@ use crate::prelude::*;
 pub struct Kernel;
 
 impl Kernel {
-    pub fn get_kernel_commit(options: &crate::Options) -> String {
+    pub fn get_kernel_commit(_options: &crate::Options) -> String {
         let cur_dir = dir_current();
-        let thing = get_thing_by_name("kernel", &options.things);
-        let path_thing = get_path_of_thing(&thing, options);
+        let thing = get_thing_by_name("kernel", &_options.things);
+        let path_thing = get_path_of_thing(&thing, _options);
         if !path_exists(&path_thing) {
             let path_thing_up = path_thing.clone().replace("kernel/", "");
             dir_change(&path_thing_up);
-            git_get_manage(&thing, options);
+            git_get_manage(&thing, _options);
         }
         dir_change(&path_thing);
         let str = run_command_get_output("git rev-parse --short HEAD");
@@ -40,8 +40,8 @@ impl SetupThing for Kernel {
         "kernel"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, &options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, &_options);
         Ok(())
     }
 
@@ -50,7 +50,7 @@ impl SetupThing for Kernel {
         Ok(())
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         remove_dir_all("../initrd/initrd_base/lib/").ok();
 
         copy_file(
@@ -62,7 +62,7 @@ impl SetupThing for Kernel {
 
         run_shell_command(
             "make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- pinenote_defconfig",
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
 
@@ -71,15 +71,15 @@ impl SetupThing for Kernel {
                 "make -j{} ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-",
                 get_cores()
             ),
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
 
         let path_of_kernel_absolute =
-            get_path_of_thing(&get_thing_by_name(self.name(), &options.things), options);
+            get_path_of_thing(&get_thing_by_name(self.name(), &_options.things), _options);
         run_shell_command(
             &format!("make -j{} ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_install INSTALL_MOD_PATH=\"{}../initrd/initrd_base/\"", get_cores(), path_of_kernel_absolute),
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
 
@@ -88,7 +88,7 @@ impl SetupThing for Kernel {
                 "make -j{} ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-",
                 get_cores()
             ),
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
 
@@ -115,7 +115,7 @@ impl SetupThing for Kernel {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

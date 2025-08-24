@@ -48,8 +48,8 @@ impl SetupThing for ExposeMmc {
         Ok(())
     }
 
-    fn deploy(&self, options: &Options) -> std::result::Result<(), String> {
-        let (port, status) = enter_uboot_cli().unwrap();
+    fn deploy(&self, _options: &Options) -> std::result::Result<(), String> {
+        let (port, _status) = enter_uboot_cli().unwrap();
 
         // TODO: make error checks
         send_read_serial(port.clone(), "mmc read ${kernel_addr_c} 0x35800 0x4000");

@@ -22,7 +22,7 @@ impl SetupThing for Rootfs {
         todo!()
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         mkdir_p(self.name());
         Ok(())
     }
@@ -31,11 +31,11 @@ impl SetupThing for Rootfs {
         Ok(())
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

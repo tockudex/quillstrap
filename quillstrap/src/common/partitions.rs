@@ -124,7 +124,7 @@ pub fn get_disk_part_numb(partition: &str) -> (String, u16) {
 // Receives /dev/sda2
 // Outputs start / size in sectors
 pub fn get_sectors(partition: &str) -> (usize, usize) {
-    let (disk, part_number) = get_disk_part_numb(partition);
+    let (disk, _part_number) = get_disk_part_numb(partition);
     let mut start_str = read_file_str(format!(
         "/sys/block/{}/{}/start",
         disk.replace("/dev/", "").replace("/", "/"),

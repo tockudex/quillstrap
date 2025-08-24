@@ -21,8 +21,8 @@ impl SetupThing for EinkKernelMagic {
         "eink-kernel-magic"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, &options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, &_options);
         Ok(())
     }
 
@@ -30,14 +30,14 @@ impl SetupThing for EinkKernelMagic {
         todo!()
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         run_command("chmod +x wbf_to_custom.py", false).unwrap();
         run_command("./wbf_to_custom.py ../../low/backup/waveform.bin", true).unwrap();
         // TODO check
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

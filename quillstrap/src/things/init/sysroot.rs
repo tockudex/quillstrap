@@ -6,25 +6,25 @@ use crate::prelude::*;
 pub struct Sysroot;
 
 impl Sysroot {
-    pub fn execute_sysroot_command(command: &str, options: &crate::Options) {
+    pub fn execute_sysroot_command(command: &str, _options: &crate::Options) {
         let cur_dir = dir_current();
-        let thing = get_thing_by_name("sysroot", &options.things);
-        let path = &get_path_of_thing(&thing, options);
+        let thing = get_thing_by_name("sysroot", &_options.things);
+        let path = &get_path_of_thing(&thing, _options);
         // info!("Sysroot path: {}", path);
-        AlpineChrootInstall::turn_on_chroot(options, path);
+        AlpineChrootInstall::turn_on_chroot(_options, path);
         dir_change(path);
         if !path_exists("quillstrap") || !is_mount_point("quillstrap") {
             mkdir_p("quillstrap");
             run_command(
-                &format!("mount --bind {} quillstrap/", options.path_of_repo),
-                options.config.command_output,
+                &format!("mount --bind {} quillstrap/", _options.path_of_repo),
+                _options.config.command_output,
             )
             .unwrap();
         }
 
         run_shell_command(
             &format!("./enter-chroot bash -c \"source ~/.bashrc; {}\"", command),
-            options.config.command_output,
+            _options.config.command_output,
         )
         .unwrap();
         dir_change(&cur_dir);
@@ -33,7 +33,7 @@ impl Sysroot {
     pub fn execute_sysroot_command_dir(
         command: &str,
         absolute_path: &str,
-        options: &crate::Options,
+        _options: &crate::Options,
     ) {
         // info!("Absolute path is: {}", absolute_path);
         let better_path = format!(
@@ -42,7 +42,7 @@ impl Sysroot {
             absolute_path.split(MAIN_BUILD_DIR).last().unwrap()
         );
         info!("Sysroot path is: {}", better_path);
-        Sysroot::execute_sysroot_command(&format!("cd {}; {}", better_path, command), options);
+        Sysroot::execute_sysroot_command(&format!("cd {}; {}", better_path, command), _options);
     }
 }
 
@@ -63,7 +63,7 @@ impl SetupThing for Sysroot {
         todo!()
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         mkdir_p(self.name());
         Ok(())
     }
@@ -72,7 +72,7 @@ impl SetupThing for Sysroot {
         todo!()
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         let cur_dir = dir_current();
         dir_change("../");
         // TODO: someone make this list smaller, not all is needed
@@ -102,17 +102,17 @@ impl SetupThing for Sysroot {
             "clang19-dev",
         ];
         AlpineChrootInstall::setup_alpine_chroot(
-            options,
+            _options,
             &format!("{}", self.name()),
             package_vec,
             "aarch64",
         );
-        AlpineChrootInstall::turn_on_chroot(options, &format!("{}/", self.name()));
+        AlpineChrootInstall::turn_on_chroot(_options, &format!("{}/", self.name()));
         dir_change(&cur_dir);
 
         Sysroot::execute_sysroot_command(
             "curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y",
-            options,
+            _options,
         );
 
         let mut file = File::create("root/.bashrc").unwrap();
@@ -122,7 +122,7 @@ impl SetupThing for Sysroot {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

@@ -20,8 +20,8 @@ impl SetupThing for Branding {
         "branding"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, &options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, &_options);
         Ok(())
     }
 
@@ -29,11 +29,11 @@ impl SetupThing for Branding {
         todo!()
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

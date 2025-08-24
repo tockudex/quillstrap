@@ -21,7 +21,7 @@ impl SetupThing for BootPartition {
         todo!()
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         mkdir_p(self.name());
         Ok(())
     }
@@ -30,30 +30,30 @@ impl SetupThing for BootPartition {
         todo!()
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         warn!("We assume because of expose_mmc deploy, the mmc is exposed as a block device");
 
         let _disk = choose_disk();
 
         let partition = get_partition("quill_boot");
         mkdir_p("/mnt/quill_boot");
-        run_command(&format!("mount {} /mnt/quill_boot", partition), options.config.command_output).unwrap();
+        run_command(&format!("mount {} /mnt/quill_boot", partition), _options.config.command_output).unwrap();
         run_command("sync", false).unwrap();
         copy_file("../kernel/out/Image.gz", "/mnt/quill_boot/Image.gz").unwrap();
         copy_file("../kernel/out/DTB", "/mnt/quill_boot/DTB").unwrap();
 
         copy_file("../firmware/wifi_bt/firmware.squashfs", "/mnt/quill_boot/firmware.squashfs").unwrap();
-        sign("/mnt/quill_boot/firmware.squashfs", "/mnt/quill_boot/firmware.squashfs.dgst", options);
+        sign("/mnt/quill_boot/firmware.squashfs", "/mnt/quill_boot/firmware.squashfs.dgst", _options);
 
         mkdir_p("/mnt/quill_boot/waveform");
         copy_file("../eink_kernel_magic/custom_wf.bin", "/mnt/quill_boot/waveform/custom_wf.bin").unwrap();
 
         run_command("sync", false).unwrap();
-        run_command(&format!("umount {}", partition), options.config.command_output).unwrap();
+        run_command(&format!("umount {}", partition), _options.config.command_output).unwrap();
 
         info!("Done, in theory, reboot the device now manually via the power button");
         Ok(())

@@ -54,6 +54,7 @@ pub fn choose_serial_port() -> String {
     }
 
     debug!("Devices that were found automatically: {:?}", devices);
+    #[allow(unused_assignments)]
     let mut input = String::new();
 
     if devices.iter().count() == 1 {

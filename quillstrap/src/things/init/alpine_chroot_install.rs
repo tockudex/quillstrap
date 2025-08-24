@@ -6,21 +6,21 @@ use crate::prelude::*;
 pub struct AlpineChrootInstall;
 
 impl AlpineChrootInstall {
-    pub fn execute(options: &crate::Options, arguments: &str) {
-        let thing = get_thing_by_name("alpine-chroot-install", &options.things);
+    pub fn execute(_options: &crate::Options, arguments: &str) {
+        let thing = get_thing_by_name("alpine-chroot-install", &_options.things);
         let path = format!(
             "{}alpine-chroot-install",
-            get_path_of_thing(&thing, options)
+            get_path_of_thing(&thing, _options)
         );
         let str = &format!("{} {}", path, arguments);
         info!("Running command: {}", str);
-        run_command(str, options.config.command_output)
+        run_command(str, _options.config.command_output)
             .expect("Failed to run alpine-chroot-install");
     }
 
     // Chroot dir without / at the end
     pub fn setup_alpine_chroot(
-        options: &crate::Options,
+        _options: &crate::Options,
         chroot_dir: &str,
         alpine_packages: Vec<&str>,
         arch: &str,
@@ -32,7 +32,7 @@ impl AlpineChrootInstall {
 
         remove_dir_all(chroot_dir).ok();
         AlpineChrootInstall::execute(
-            options,
+            _options,
             &format!(
                 "-d {} -p {} -a {}",
                 chroot_dir_absolute,
@@ -44,8 +44,8 @@ impl AlpineChrootInstall {
     }
 
     // Dir, with / at the end. It's the path to the actual sysroot, not sysroot and usr next to it
-    pub fn turn_on_chroot(options: &crate::Options, dir: &str) {
-        // let thing = get_thing_by_name("alpine-chroot-install", &options.things);
+    pub fn turn_on_chroot(_options: &crate::Options, dir: &str) {
+        // let thing = get_thing_by_name("alpine-chroot-install", &_options.things);
         mount_point(&format!("{}proc", dir), "proc");
         mount_point(&format!("{}sys", dir), "sysfs");
         mount_point(&format!("{}tmp", dir), "tmpfs");
@@ -74,8 +74,8 @@ impl SetupThing for AlpineChrootInstall {
         "alpine-chroot-install"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, &options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, &_options);
         Ok(())
     }
 
@@ -83,11 +83,11 @@ impl SetupThing for AlpineChrootInstall {
         todo!()
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         todo!();
     }
 

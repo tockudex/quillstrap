@@ -22,8 +22,8 @@ impl SetupThing for QuillInit {
         "quill-init"
     }
 
-    fn get(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        git_get_manage(self, &options);
+    fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        git_get_manage(self, &_options);
         Ok(())
     }
 
@@ -32,7 +32,7 @@ impl SetupThing for QuillInit {
         Ok(())
     }
 
-    fn build(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         let cur_dir = dir_current();
         mkdir_p("out/");
 
@@ -44,20 +44,20 @@ impl SetupThing for QuillInit {
         Sysroot::execute_sysroot_command_dir(
             "cargo build --release",
             &cur_dir,
-            options,
+            _options,
         );
         copy_file("../target/release/qinit", "../out/qinit").unwrap();
         Sysroot::execute_sysroot_command_dir(
             "cargo build --release --features init_wrapper",
             &cur_dir,
-            options,
+            _options,
         );
         copy_file("../target/release/qinit", "../out/init").unwrap();
 
         Ok(())
     }
 
-    fn deploy(&self, options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+    fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         /*
         cd "$(dirname ${0})"
         BINARY_NAME="qinit"
