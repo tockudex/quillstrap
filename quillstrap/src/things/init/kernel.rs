@@ -46,7 +46,18 @@ impl SetupThing for Kernel {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
-        run_command("make distclean", true).unwrap();
+        remove_dir_all("../initrd/initrd_base/lib/").ok();
+
+        run_command(
+            "make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- clean",
+            true,
+        )
+        .unwrap();
+        run_command(
+            "make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- distclean",
+            true,
+        )
+        .unwrap();
         Ok(())
     }
 

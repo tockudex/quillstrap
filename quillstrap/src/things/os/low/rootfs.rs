@@ -114,7 +114,8 @@ impl SetupThing for Rootfs {
 
         // Files and dirs
         if _options.config.unrestricted {
-            File::create(&format!("{}.unrestricted", RD)).unwrap();
+            // For now, no
+            // File::create(&format!("{}.unrestricted", RD)).unwrap();
         }
         mkdir_p(&format!("{}lib/modules", RD));
         mkdir_p(&format!("{}lib/firmware", RD));
@@ -206,7 +207,7 @@ impl SetupThing for Rootfs {
         if !path_exists("/mnt/quill_main/system/rootfs.squashfs") || !path_exists("/mnt/quill_main/system/rootfs.squashfs.dgst") {
             panic!("Failed to copy rootfs filesystem to pinenote");
         }
-        
+
         run_command("sync", false).unwrap();
         run_command(
             &format!("umount {}", partition),

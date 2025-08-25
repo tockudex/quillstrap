@@ -38,17 +38,23 @@ impl SetupThing for QuillInit {
 
         dir_change("qinit");
 
+        let mut features: Vec<&str> = vec!["init_wrapper"];
+
+        if _options.config.unrestricted {
+            features.push("free_roam");
+        }
+
         // RUST_FLAGS=\"-C target-feature=-crt-static\" is applied in config.toml
 
         // TODO features from config
         Sysroot::execute_sysroot_command_dir(
-            "cargo build --release",
+            &format!("cargo build --release --features {}", features.join(",")),
             &cur_dir,
             _options,
         );
         copy_file("../target/release/qinit", "../out/qinit").unwrap();
         Sysroot::execute_sysroot_command_dir(
-            "cargo build --release --features init_wrapper",
+            &format!("cargo build --release --features {}", features.join(",")),
             &cur_dir,
             _options,
         );
