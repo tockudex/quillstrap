@@ -1,6 +1,4 @@
-use std::{
-    env, fs::remove_dir_all, path::Path
-};
+use std::{env, fs::remove_dir_all, path::Path};
 
 use crate::prelude::*;
 
@@ -76,4 +74,50 @@ pub fn replace_string_file(file: &str, str_to_replace: &str, replace_with: &str)
     let content = std::fs::read_to_string(file).unwrap();
     let new_content = content.replace(str_to_replace, replace_with);
     std::fs::write(file, new_content).unwrap();
+}
+
+pub fn copy_dir_content(src: &str, dst: &str) {
+    if !path_exists(src) {
+        panic!("There is no {} dir", src);
+    }
+    if !path_exists(dst) {
+        panic!("There is no {} dir", dst);
+    }
+    fn copy_recursively(src: &Path, dst: &Path) {
+        for entry in std::fs::read_dir(src)
+            .expect(&format!("Failed to read directory {}", src.display())) 
+        {
+            let entry = entry.expect(&format!("Failed to get entry in {}", src.display()));
+            let path = entry.path();
+            let dest_path = dst.join(entry.file_name());
+
+            if path.is_dir() {
+                std::fs::create_dir_all(&dest_path)
+                    .expect(&format!("Failed to create directory {}", dest_path.display()));
+                copy_recursively(&path, &dest_path);
+            } else {
+                if let Some(parent) = dest_path.parent() {
+                    std::fs::create_dir_all(parent)
+                        .expect(&format!("Failed to create parent directory {}", parent.display()));
+                }
+                std::fs::copy(&path, &dest_path)
+                    .expect(&format!("Failed to copy file {} to {}", path.display(), dest_path.display()));
+            }
+        }
+    }
+
+    copy_recursively(Path::new(src), Path::new(dst));
+}
+
+pub fn remove_files_recursive(dir: &str, target: &str) {
+    let entries = std::fs::read_dir(dir).expect(&format!("Failed to read directory {}", dir));
+    for entry in entries {
+        let entry = entry.expect("Failed to read entry");
+        let path = entry.path();
+        if path.is_dir() {
+            remove_files_recursive(path.to_str().unwrap(), target);
+        } else if path.file_name().unwrap() == target {
+            std::fs::remove_file(&path).expect(&format!("Deleted file {:?}", path));
+        }
+    }
 }

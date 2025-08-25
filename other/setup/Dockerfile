@@ -52,3 +52,6 @@ RUN apt-get install -y picocom lrzsz ckermit qemu-utils expect parted fdisk
 
 # Eink kernel magic
 RUN apt-get install -y python3-numpy
+
+# Rootfs
+RUN apt-get install -y squashfs-tools

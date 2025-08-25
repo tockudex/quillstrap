@@ -1,5 +1,5 @@
 use crate::{
-    prelude::*,
+    prelude::*, things::os::low::rootfs_configs::RootfsConfigs,
 };
 
 pub mod init;
@@ -24,6 +24,7 @@ pub enum TraitWrapper {
     TwFirmware(Firmware),
     TwEinkKernelMagic(EinkKernelMagic),
     TwRootfs(Rootfs),
+    TwRootfsConfigs(RootfsConfigs),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -46,6 +47,7 @@ macro_rules! forward {
             TraitWrapper::TwFirmware(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwEinkKernelMagic(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwRootfs(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwRootfsConfigs(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -107,6 +109,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwFirmware(Default::default()),
         TwEinkKernelMagic(Default::default()),
         TwRootfs(Default::default()),
+        TwRootfsConfigs(Default::default()),
     ]
 }
 
