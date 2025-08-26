@@ -63,6 +63,11 @@ impl SetupThing for Rootfs {
         mkdir_p(self.name());
         dir_change(self.name());
 
+        if path_exists("rootfs.tar.xz") && path_exists("rootfs") {
+            warn!("Rootfs file and dir already present. We won't redownload them, use clean if you want to force this");
+            return Ok(());
+        }
+
         remove_file("rootfs.tar.xz").ok();
         remove_dir_all("rootfs").ok();
 
@@ -89,7 +94,7 @@ impl SetupThing for Rootfs {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
-        Ok(())
+        todo!()
     }
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
