@@ -25,6 +25,7 @@ pub enum TraitWrapper {
     TwEinkKernelMagic(EinkKernelMagic),
     TwRootfs(Rootfs),
     TwRootfsConfigs(RootfsConfigs),
+    TwSerialLaunch(SerialLaunch),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -48,6 +49,7 @@ macro_rules! forward {
             TraitWrapper::TwEinkKernelMagic(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwRootfs(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwRootfsConfigs(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwSerialLaunch(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -110,6 +112,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwEinkKernelMagic(Default::default()),
         TwRootfs(Default::default()),
         TwRootfsConfigs(Default::default()),
+        TwSerialLaunch(Default::default()),
     ]
 }
 
