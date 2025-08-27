@@ -58,7 +58,8 @@ impl Args {
         }
 
         if !args.auto_mode && !args.manual_mode {
-            panic!("Select a mode!");
+            warn!("Select a mode! Defaulting to manual mode!");
+            args.manual_mode = true;
         }
 
         if args.build.is_empty()

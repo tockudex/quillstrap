@@ -121,3 +121,13 @@ pub fn remove_files_recursive(dir: &str, target: &str) {
         }
     }
 }
+
+pub fn append_to_file(path: &str, string: &str) {
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(path)
+        .expect(&format!("Failed to open or create the file at path: {}", path));
+    file.write_all(string.as_bytes())
+        .expect(&format!("Failed to write the string to the file at path: {}", path));
+}

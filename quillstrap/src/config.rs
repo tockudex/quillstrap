@@ -32,6 +32,10 @@ pub struct Config {
     pub command_output: bool,
     pub main_private_key_path: String, // Relative to root of the quillstrap repo!
     pub unrestricted: bool,
+    // Also applied when unrestricred is true
+    pub root_password: String,
+    // Rootfs ssh login. Needs unrestricted to true too
+    pub unsecure_debug: bool,
 }
 
 impl Default for Config {
@@ -43,6 +47,8 @@ impl Default for Config {
             command_output: true,
             main_private_key_path: String::from("other/private/private.pem"),
             unrestricted: true, // :)
+            root_password: "root".to_string(),
+            unsecure_debug: false, // :(
         }
     }
 }

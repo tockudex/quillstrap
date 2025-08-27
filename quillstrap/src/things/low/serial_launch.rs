@@ -23,7 +23,7 @@ impl SetupThing for SerialLaunch {
         todo!()
     }
 
-    fn get(&self, options: &Options) -> std::result::Result<(), String> {
+    fn get(&self, _options: &Options) -> std::result::Result<(), String> {
         mkdir_p(self.name());
         Ok(())
     }

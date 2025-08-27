@@ -6,8 +6,7 @@ pub struct QuillInit;
 
 impl SetupThing for QuillInit {
     fn name(&self) -> &'static str {
-        // TODO: change to _
-        "quill-init"
+        "quill_init"
     }
 
     fn path(&self) -> &'static str {

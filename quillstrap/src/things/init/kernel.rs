@@ -33,7 +33,7 @@ impl SetupThing for Kernel {
     }
 
     fn deps(&self) -> Vec<&'static str> {
-        vec!["initrd", "quill-init"]
+        vec!["initrd", "quill_init"]
     }
 
     fn git(&self) -> &'static str {
@@ -65,11 +65,11 @@ impl SetupThing for Kernel {
         remove_dir_all("../initrd/initrd_base/lib/").ok();
 
         copy_file(
-            "../quill-init/out/qinit",
+            "../quill_init/out/qinit",
             "../initrd/initrd_base/etc/init.d/qinit",
         )
         .unwrap();
-        copy_file("../quill-init/out/init", "../initrd/initrd_base/sbin/init").unwrap();
+        copy_file("../quill_init/out/init", "../initrd/initrd_base/sbin/init").unwrap();
 
         run_shell_command(
             "make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- pinenote_defconfig",
