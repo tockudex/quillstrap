@@ -1,5 +1,5 @@
 use crate::{
-    prelude::*, things::os::low::rootfs_configs::RootfsConfigs,
+    prelude::*, things::{os::low::rootfs_configs::RootfsConfigs},
 };
 
 pub mod init;
@@ -26,6 +26,7 @@ pub enum TraitWrapper {
     TwRootfs(Rootfs),
     TwRootfsConfigs(RootfsConfigs),
     TwSerialLaunch(SerialLaunch),
+    TwRootfsSysroot(RootfsSysroot),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -50,6 +51,7 @@ macro_rules! forward {
             TraitWrapper::TwRootfs(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwRootfsConfigs(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwSerialLaunch(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwRootfsSysroot(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -113,6 +115,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwRootfs(Default::default()),
         TwRootfsConfigs(Default::default()),
         TwSerialLaunch(Default::default()),
+        TwRootfsSysroot(Default::default()),
     ]
 }
 
@@ -122,5 +125,9 @@ pub fn get_thing_by_name(name: &str, things: &Vec<TraitWrapper>) -> TraitWrapper
             return *thing;
         }
     }
-    panic!("You probably mistyped this: {}", name);
+    let mut names = Vec::new();
+    for thing in things.iter() {
+        names.push(thing.name());
+    }
+    panic!("You probably mistyped this: {}. Possible options: {}", name, names.join(" "));
 }

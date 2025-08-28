@@ -34,4 +34,6 @@ pub use log::*;
 pub use std::fs::File;
 pub use std::path::Path;
 pub use crate::os::low::rootfs::*;
+pub use crate::os::low::rootfs_configs::*;
+pub use crate::os::low::rootfs_sysroot::*;
 pub use std::io::Write;
