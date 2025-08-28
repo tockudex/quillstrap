@@ -146,6 +146,7 @@ impl SetupThing for Rootfs {
         // Other configs, manually
         // Dropbear
         if _options.config.unrestricted {
+            Rootfs::execute(RD, &format!("dnf --assumeyes install dropbear"), true);
             run_command(
                 &format!(
                     "ln -s ../../boot/rsa_hkey {}etc/dropbear/dropbear_rsa_host_key",
@@ -177,7 +178,10 @@ impl SetupThing for Rootfs {
         if _options.config.unsecure_debug && _options.config.unrestricted {
             Rootfs::execute(RD, &format!("dnf --assumeyes install sshd"), true);
             Rootfs::execute(RD, &format!("systemctl enable sshd"), true);
-            append_to_file(&format!("{}etc/ssh/sshd_config", RD), "PermitRootLogin yes\n");
+            append_to_file(
+                &format!("{}etc/ssh/sshd_config", RD),
+                "PermitRootLogin yes\n",
+            );
         }
 
         // Other

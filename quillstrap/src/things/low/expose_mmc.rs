@@ -26,6 +26,10 @@ impl SetupThing for ExposeMmc {
         remove_dir_all(self.name()).ok();
         mkdir_p(self.name());
         dir_change(self.name());
+        if path_exists("Image.gz") && path_exists("dtb") {
+            warn!("Files exist, if you want to redownload them, run clean");
+            return Ok(());
+        }
         download_file(
             "https://github.com/PorQ-Pine/initrd/releases/download/1/Image.gz",
             "Image.gz",
@@ -39,6 +43,8 @@ impl SetupThing for ExposeMmc {
     }
 
     fn clean(&self) -> std::result::Result<(), String> {
+        remove_file("Image.gz").ok();
+        remove_file("dtb").ok();
         Ok(())
     }
 
