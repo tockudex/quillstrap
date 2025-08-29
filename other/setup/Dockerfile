@@ -1,15 +1,15 @@
-FROM --platform=linux/amd64 ubuntu:24.04
+FROM --platform=linux/arm64 ubuntu:24.04
 
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
-RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio
+RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio vim
 
 # Rust stuff
 RUN apt-get install -y gcc build-essential curl pkg-config libinput10 pkg-config libusb-1.0-0-dev libftdi1-dev libudev-dev
 ENV PATH="${PATH}:/root/.cargo/bin"
 
 # VS Code stuff
-RUN apt-get install -y git
+RUN apt-get install -y git libxkbcommon-dev libgbm-dev
 
 # quillstrap stuff
 RUN apt-get install -y openssl libssl-dev clang
