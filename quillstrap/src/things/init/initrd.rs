@@ -38,7 +38,7 @@ impl SetupThing for InitRD {
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         let cur_dir = dir_current();
         // TODO: someone make this list smaller, not all is needed
-        let package_vec: Vec<&str> = vec![
+        let mut packages: Vec<&str> = vec![
             "busybox",
             "busybox-extras",
             "libxkbcommon",
@@ -50,10 +50,6 @@ impl SetupThing for InitRD {
             "mtdev",
             "libevdev",
             "openssl",
-            "dropbear",
-            "dropbear-ssh",
-            "dropbear-scp",
-            "openssh-sftp-server",
             "fontconfig",
             "openrc",
             "fuse-overlayfs",
@@ -65,13 +61,25 @@ impl SetupThing for InitRD {
             "gptfdisk",
         ];
 
+        if _options.config.unsecure_debug {
+            let mut debug_packages = vec![
+                "dropbear",
+                "dropbear-ssh",
+                "dropbear-scp",
+                "openssh-sftp-server",
+            ];
+            packages.append(&mut debug_packages);
+        }
+
         if !path_exists("initrd_alpine") {
             AlpineChrootInstall::setup_alpine_chroot(
                 _options,
                 &format!("initrd_alpine"),
-                package_vec,
+                packages,
                 "aarch64",
             );
+        } else {
+            warn!("If you want to actually rebuild initrd alpine, you need to clean it first!");
         }
 
         // AlpineChrootInstall::turn_on_chroot(_options, &format!("{}/", self.name()));
@@ -83,11 +91,11 @@ impl SetupThing for InitRD {
         )
         .unwrap();
 
-        remove_file(&format!("env.sh")).ok();
-        remove_file(&format!("destroy")).ok();
-        remove_file(&format!("enter-chroot")).ok();
-        remove_file(&format!("etc/motd")).ok();
-        remove_file(&format!("etc/resolv.conf")).ok();
+        remove_file(&format!("env.sh"), false).ok();
+        remove_file(&format!("destroy"), false).ok();
+        remove_file(&format!("enter-chroot"), false).ok();
+        remove_file(&format!("etc/motd"), false).ok();
+        remove_file(&format!("etc/resolv.conf"), false).ok();
 
         remove_dir_all("var/cache").ok();
 

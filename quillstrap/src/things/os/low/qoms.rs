@@ -30,9 +30,9 @@ impl SetupThing for Qoms {
     }
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        dir_change("qoms");
-        run_command("cargo build --release", _options.config.command_output).unwrap();
-        dir_change("../");
+        run_command("./build.sh", _options.config.command_output).unwrap();
+        mkdir_p("out");
+        copy_file("qoms/target/aarch64-unknown-linux-gnu/release/qoms", "out/qoms").unwrap();
         Ok(())
     }
 

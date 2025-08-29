@@ -43,8 +43,8 @@ impl SetupThing for ExposeMmc {
     }
 
     fn clean(&self) -> std::result::Result<(), String> {
-        remove_file("Image.gz").ok();
-        remove_file("dtb").ok();
+        remove_file("Image.gz", false).ok();
+        remove_file("dtb", false).ok();
         Ok(())
     }
 

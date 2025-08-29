@@ -50,7 +50,7 @@ impl SetupThing for BackupMmc {
 
         show_wait_toast("This will remove the old backup, if you don't want that, abort now!");
         warn!("Removing old backup");
-        remove_file("pinenote_disk.qcow2").ok();
+        remove_file("pinenote_disk.qcow2", true).ok();
 
         info!("Taking the backup...");
         run_command(

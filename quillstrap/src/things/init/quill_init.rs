@@ -45,6 +45,11 @@ impl SetupThing for QuillInit {
             features_wrapper.push("free_roam");
         }
 
+        if _options.config.unsecure_debug {
+            features_normal.push("debug");
+            features_wrapper.push("debug");
+        }
+
         // RUST_FLAGS=\"-C target-feature=-crt-static\" is applied in config.toml
 
         // TODO features from config

@@ -25,14 +25,16 @@ pub fn copy_file(src: &str, dest: &str) -> Result<(), std::io::Error> {
     }
 }
 
-pub fn remove_file(path: &str) -> Result<(), std::io::Error> {
+pub fn remove_file(path: &str, error_out: bool) -> Result<(), std::io::Error> {
     match std::fs::remove_file(path) {
         Ok(_) => Ok(()),
         Err(e) => {
-            error!(
-                "Failed to remove file at path: \"{}\", error: {:?}",
-                &path, e
-            );
+            if error_out {
+                error!(
+                    "Failed to remove file at path: \"{}\", error: {:?}",
+                    &path, e
+                );
+            }
             Err(e)
         }
     }
@@ -84,24 +86,31 @@ pub fn copy_dir_content(src: &str, dst: &str) {
         panic!("There is no {} dir", dst);
     }
     fn copy_recursively(src: &Path, dst: &Path) {
-        for entry in std::fs::read_dir(src)
-            .expect(&format!("Failed to read directory {}", src.display())) 
+        for entry in
+            std::fs::read_dir(src).expect(&format!("Failed to read directory {}", src.display()))
         {
             let entry = entry.expect(&format!("Failed to get entry in {}", src.display()));
             let path = entry.path();
             let dest_path = dst.join(entry.file_name());
 
             if path.is_dir() {
-                std::fs::create_dir_all(&dest_path)
-                    .expect(&format!("Failed to create directory {}", dest_path.display()));
+                std::fs::create_dir_all(&dest_path).expect(&format!(
+                    "Failed to create directory {}",
+                    dest_path.display()
+                ));
                 copy_recursively(&path, &dest_path);
             } else {
                 if let Some(parent) = dest_path.parent() {
-                    std::fs::create_dir_all(parent)
-                        .expect(&format!("Failed to create parent directory {}", parent.display()));
+                    std::fs::create_dir_all(parent).expect(&format!(
+                        "Failed to create parent directory {}",
+                        parent.display()
+                    ));
                 }
-                std::fs::copy(&path, &dest_path)
-                    .expect(&format!("Failed to copy file {} to {}", path.display(), dest_path.display()));
+                std::fs::copy(&path, &dest_path).expect(&format!(
+                    "Failed to copy file {} to {}",
+                    path.display(),
+                    dest_path.display()
+                ));
             }
         }
     }
@@ -127,7 +136,12 @@ pub fn append_to_file(path: &str, string: &str) {
         .append(true)
         .create(true)
         .open(path)
-        .expect(&format!("Failed to open or create the file at path: {}", path));
-    file.write_all(string.as_bytes())
-        .expect(&format!("Failed to write the string to the file at path: {}", path));
+        .expect(&format!(
+            "Failed to open or create the file at path: {}",
+            path
+        ));
+    file.write_all(string.as_bytes()).expect(&format!(
+        "Failed to write the string to the file at path: {}",
+        path
+    ));
 }
