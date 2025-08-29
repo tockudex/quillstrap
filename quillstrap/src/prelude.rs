@@ -36,4 +36,5 @@ pub use std::path::Path;
 pub use crate::os::low::rootfs::*;
 pub use crate::os::low::rootfs_configs::*;
 pub use crate::os::low::rootfs_sysroot::*;
+pub use crate::os::low::qoms::*;
 pub use std::io::Write;
