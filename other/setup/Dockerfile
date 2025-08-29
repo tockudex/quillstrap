@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 ubuntu:24.04
+FROM ubuntu:24.04
 
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
