@@ -25,7 +25,7 @@ pub enum GitPlatform {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct QinitOptions {
-    pub deploy_ssh_ip_addr: [u8; 4],
+    pub deploy_ssh_ip_addr: [u8; 4], // Default for us is 192.168.3.2
     pub deploy_ssh_port: u16,
 }
 
