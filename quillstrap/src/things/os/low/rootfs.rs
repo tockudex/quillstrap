@@ -107,10 +107,16 @@ impl SetupThing for Rootfs {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
-        todo!()
+        remove_dir_all("rootfs/").ok();
+        mkdir_p("rootfs");
+        run_command(&format!("tar -xJf rootfs.tar.xz -C rootfs"), true).unwrap();
+
+        Ok(())
     }
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        warn!("This is an additive build, if you builded it before with different features, you should clean it now!");
+        
         const RD: &str = "rootfs/";
         Rootfs::turn_on_chroot(RD);
 
@@ -180,6 +186,7 @@ impl SetupThing for Rootfs {
         }
 
         // Ssh enabled at default with root login enabled
+        /* Dropbear is already running!
         if _options.config.unsecure_debug && _options.config.unrestricted {
             Rootfs::execute(RD, &format!("dnf --assumeyes install sshd"), true);
             Rootfs::execute(RD, &format!("systemctl enable sshd"), true);
@@ -188,6 +195,7 @@ impl SetupThing for Rootfs {
                 "PermitRootLogin yes\n",
             );
         }
+        */
 
         // Other
         replace_string_file(
