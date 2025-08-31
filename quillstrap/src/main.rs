@@ -32,6 +32,7 @@ fn main() -> Result<()> {
 
     mkdir_p("../other/private");
     let config = Config::load();
+    config.validate();
     let things = get_things();
 
     let options = Options {

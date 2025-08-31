@@ -110,12 +110,17 @@ impl SetupThing for QuillInit {
         if !_options.args.quill_init_options.qi_ssh_build {
             error!("This is not a ssh build, yet we are deplying to ssh. You have been warned!");
         }
+        let ip_str = _options
+            .config
+            .qinit_options
+            .deploy_ssh_ip_addr
+            .map(|b| std::str::from_utf8(&[b]).unwrap().to_string())
+            .join(".");
+
         run_command(
             &format!(
                 "ssh -p {} root@{} killall {}",
-                &_options.config.qinit_options.deploy_ssh_port,
-                &_options.config.qinit_options.deploy_ssh_ip_addr,
-                &QINIT_BINARY
+                &_options.config.qinit_options.deploy_ssh_port, &ip_str, &QINIT_BINARY
             ),
             false,
         )
@@ -126,7 +131,7 @@ impl SetupThing for QuillInit {
                 &_options.config.qinit_options.deploy_ssh_port,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX,
-                &_options.config.qinit_options.deploy_ssh_ip_addr
+                &ip_str
             ),
             true,
         )
@@ -135,7 +140,7 @@ impl SetupThing for QuillInit {
             &format!(
                 "ssh -t -p {} root@{} 'RUST_LOG=info SLINT_KMS_ROTATION=270 /tmp/{}{}'",
                 &_options.config.qinit_options.deploy_ssh_port,
-                &_options.config.qinit_options.deploy_ssh_ip_addr,
+                &ip_str,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX
             ),

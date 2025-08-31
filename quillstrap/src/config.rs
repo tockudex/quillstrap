@@ -25,8 +25,8 @@ pub enum GitPlatform {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct QinitOptions {
-    pub deploy_ssh_ip_addr: String,
-    pub deploy_ssh_port: String,
+    pub deploy_ssh_ip_addr: [u8; 4],
+    pub deploy_ssh_port: u16,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
@@ -56,7 +56,10 @@ impl Default for Config {
             unrestricted: true, // :)
             root_password: "root".to_string(),
             unsecure_debug: false, // :(
-            qinit_options: QinitOptions { deploy_ssh_ip_addr: "192.168.3.2".to_string(), deploy_ssh_port: "2222".to_string() }
+            qinit_options: QinitOptions {
+                deploy_ssh_ip_addr: [0, 0, 0, 0],
+                deploy_ssh_port: 2222,
+            },
         }
     }
 }
@@ -78,7 +81,8 @@ impl Config {
                         warn!("Config file is good but fresh exists, I will remove fresh");
                         remove_file(CONFIG_PATH_FRESH, false).ok();
                     }
-                    return conf;},
+                    return conf;
+                }
                 Err(err) => {
                     Config::default().save(CONFIG_PATH_FRESH.to_string());
                     // TODO this in the future to insert them automatically, thats stupid as hell
@@ -102,6 +106,12 @@ impl Config {
                     );
                 }
             },
+        }
+    }
+
+    pub fn validate(&self) {
+        if self.qinit_options.deploy_ssh_ip_addr == [0,0,0,0] {
+            warn!("The qinit deploy ip address is not set, it will not work!");
         }
     }
 }
