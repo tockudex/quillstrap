@@ -13,6 +13,7 @@ const ESSENTIAL_PACKAGES: &[&str] = &[
     "vim",
     "nano",
     "busybox",
+    "htop",
 ];
 
 #[derive(Clone, Copy, Default)]
@@ -116,7 +117,7 @@ impl SetupThing for Rootfs {
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
         warn!("This is an additive build, if you builded it before with different features, you should clean it now!");
-        
+
         const RD: &str = "rootfs/";
         Rootfs::turn_on_chroot(RD);
 
