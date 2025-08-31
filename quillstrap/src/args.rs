@@ -1,6 +1,9 @@
 use crate::prelude::*;
 use clap::Parser;
 
+const GENERAL_OPTIONS: &str = "Run options";
+const QUILL_INIT_OPTIONS: &str = "Quill Init options";
+
 #[derive(Parser, Clone, Debug)]
 #[command(about = "Quill OS build and bootstrap tool")]
 pub struct Args {
@@ -8,43 +11,51 @@ pub struct Args {
         short,
         long,
         help = "You need to specify everything what quillstrap should do manually.",
-        default_value_t = false
+        default_value_t = false, help_heading = GENERAL_OPTIONS
     )]
     pub manual_mode: bool,
     #[arg(
         short,
         long,
         help = "Specify a single action, then everything that's needed will be done to achieve it",
-        default_value_t = false
+        default_value_t = false, help_heading = GENERAL_OPTIONS
     )]
     pub auto_mode: bool,
     #[arg(
         short,long,
         help = "Things to get (or check for updates), seperated by space. Possible all option",
-        num_args = 1..,
+        num_args = 1.., help_heading = GENERAL_OPTIONS
     )]
-    // Order is important in those vecs!
     pub get: Vec<String>,
     #[arg(
         short,long,
         help = "Things to build, seperated by space",
-        num_args = 1..,
+        num_args = 1..,help_heading = GENERAL_OPTIONS
     )]
     pub build: Vec<String>,
     #[arg(
         short,long,
         help = "Things to clean, seperated by space",
-        num_args = 1..,
+        num_args = 1..,help_heading = GENERAL_OPTIONS
     )]
     pub clean: Vec<String>,
     #[arg(
         short,long,
         help = "Things to deploy, seperated by space",
-        num_args = 1..,
+        num_args = 1..,help_heading = GENERAL_OPTIONS
     )]
     pub deploy: Vec<String>,
-    #[arg(short, long, help = "A single thing to run")]
+    #[arg(short, long, help = "A single thing to run", help_heading = GENERAL_OPTIONS)]
     pub run: Option<String>,
+
+    #[command(flatten)]
+    pub quill_init_options: QuillInitOptions,
+}
+
+#[derive(Parser, Clone, Debug)]
+pub struct QuillInitOptions {
+    #[arg(long, help = "For quill_init ssh build", help_heading = QUILL_INIT_OPTIONS)]
+    pub qi_ssh_build: bool,
 }
 
 impl Args {

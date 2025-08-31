@@ -1,5 +1,3 @@
-use std::fs::remove_dir_all;
-
 use crate::prelude::*;
 
 #[derive(Clone, Copy, Default)]
@@ -23,7 +21,6 @@ impl SetupThing for ExposeMmc {
     }
 
     fn get(&self, _options: &Options) -> std::result::Result<(), String> {
-        remove_dir_all(self.name()).ok();
         mkdir_p(self.name());
         dir_change(self.name());
         if path_exists("Image.gz") && path_exists("dtb") {

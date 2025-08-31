@@ -15,5 +15,18 @@
                 }
             }
         },
+        {
+            "label": "Welcome back",
+            "type": "shell",
+            "command": "other/setup/welcome_back.sh",
+            "icon": {
+                "id": "log-in",
+            },
+            "options": {
+                "statusbar": {
+                    "color": "#5dd2f0"
+                }
+            }
+        },
     ]
 }
