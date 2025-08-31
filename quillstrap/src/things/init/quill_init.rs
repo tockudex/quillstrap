@@ -75,7 +75,6 @@ impl SetupThing for QuillInit {
             "OPENSSL_INCLUDE_DIR",
             &format!("{}../sysroot/usr/include/openssl", full_path),
         );
-        set_var("CC_aarch64_unknown_linux_gnu", "aarch64-linux-gnu-gcc");
         set_var(
             "RUSTFLAGS",
             &format!(
@@ -99,41 +98,41 @@ impl SetupThing for QuillInit {
             features_normal.push("gui_only");
             run_command(
                 &format!(
-                    "cargo zigbuild --target aarch64-unknown-linux-gnu --features={}",
+                    "cargo zigbuild --target aarch64-unknown-linux-musl --features={}",
                     features_normal.join(",")
                 ),
                 _options.config.command_output,
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-gnu/debug/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-musl/debug/{}", &QINIT_BINARY),
                 &format!("../out/{}{}", &QINIT_BINARY, &QINIT_GUI_ONLY_SUFFIX),
             )
             .unwrap();
         } else {
             run_command(
                 &format!(
-                    "cargo zigbuild --release --target aarch64-unknown-linux-gnu --features={}",
+                    "cargo zigbuild --release --target aarch64-unknown-linux-musl --features={}",
                     features_normal.join(",")
                 ),
                 _options.config.command_output,
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-gnu/release/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-musl/release/{}", &QINIT_BINARY),
                 &format!("../out/{}", &QINIT_BINARY),
             )
             .unwrap();
             run_command(
                 &format!(
-                    "cargo zigbuild --release --target aarch64-unknown-linux-gnu --features={}",
+                    "cargo zigbuild --release --target aarch64-unknown-linux-musl --features={}",
                     features_wrapper.join(",")
                 ),
                 _options.config.command_output,
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-gnu/release/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-musl/release/{}", &QINIT_BINARY),
                 "../out/init",
             )
             .unwrap();
