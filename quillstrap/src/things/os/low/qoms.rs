@@ -30,9 +30,36 @@ impl SetupThing for Qoms {
     }
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        run_command("./build.sh", _options.config.command_output).unwrap();
+        dir_change("qoms");
+
+        set_var("PKG_CONFIG_ALLOW_CROSS", "1");
+        set_var("PKG_CONFIG_SYSROOT_DIR", "../../rootfs_sysroot/sysroot");
+        /*
+        set_var(
+            "PKG_CONFIG_PATH",
+            "../../rootfs_sysroot/sysroot/usr/lib/aarch64-linux-gnu/pkgconfig",
+        );
+        */
+        set_var("RUSTFLAGS", "-L ../../rootfs_sysroot/sysroot/usr/lib64");
+
+        run_command(
+            "cargo zigbuild --release --target aarch64-unknown-linux-gnu",
+            _options.config.command_output,
+        )
+        .unwrap();
+
+        set_var("PKG_CONFIG_ALLOW_CROSS", "");
+        set_var("PKG_CONFIG_SYSROOT_DIR", "");
+        set_var("PKG_CONFIG_PATH", "");
+        set_var("RUSTFLAGS", "");
+
+        dir_change("../");
         mkdir_p("out");
-        copy_file("qoms/target/aarch64-unknown-linux-gnu/release/qoms", "out/qoms").unwrap();
+        copy_file(
+            "qoms/target/aarch64-unknown-linux-gnu/release/qoms",
+            "out/qoms",
+        )
+        .unwrap();
         Ok(())
     }
 

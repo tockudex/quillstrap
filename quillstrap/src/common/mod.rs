@@ -28,3 +28,14 @@ pub fn get_path_of_thing(thing: &TraitWrapper, options: &crate::Options) -> Stri
         thing.name()
     )
 }
+
+// With / at the end
+pub fn get_path_of_thing_native<T: SetupThing>(thing: &T, options: &crate::Options) -> String {
+    format!(
+        "{}{}/{}{}/",
+        options.path_of_repo,
+        MAIN_BUILD_DIR,
+        thing.path(),
+        thing.name()
+    )
+}

@@ -50,7 +50,39 @@ impl SetupThing for QuillInit {
             features_normal.push("debug");
         }
 
-        // RUST_FLAGS=\"-C target-feature=-crt-static\" is applied in config.toml
+        let full_path = get_path_of_thing_native(self, _options);
+        set_var("PKG_CONFIG_ALLOW_CROSS", "1");
+        set_var(
+            "PKG_CONFIG_SYSROOT_DIR",
+            &format!("{}../sysroot", full_path),
+        );
+        set_var(
+            "PKG_CONFIG_PATH",
+            &format!("{}../sysroot/usr/lib/pkgconfig", full_path),
+        );
+        set_var("PKG_CONFIG_ALLOW_CROSS", "1");
+        set_var(
+            "PKG_CONFIG_SYSROOT_DIR",
+            &format!("{}../sysroot", full_path),
+        );
+        set_var(
+            "PKG_CONFIG_PATH",
+            &format!("{}../sysroot/usr/lib/pkgconfig", full_path),
+        );
+        // set_var("OPENSSL_DIR", "../../sysroot/usr/include/openssl");
+        // set_var("OPENSSL_LIB_DIR", "../../sysroot/usr/lib");
+        set_var(
+            "OPENSSL_INCLUDE_DIR",
+            &format!("{}../sysroot/usr/include/openssl", full_path),
+        );
+        set_var("CC_aarch64_unknown_linux_gnu", "aarch64-linux-gnu-gcc");
+        set_var(
+            "RUSTFLAGS",
+            &format!(
+                "-C target-feature=-crt-static -L {}../sysroot/usr/lib/",
+                full_path
+            ),
+        );
 
         if _options.args.quill_init_options.qi_ssh_build {
             warn!("Building Quill-init ssh debug build");
@@ -65,44 +97,48 @@ impl SetupThing for QuillInit {
             }
 
             features_normal.push("gui_only");
-            Sysroot::execute_sysroot_command_dir(
-                &format!("cargo build --features={}", features_normal.join(",")),
-                &cur_dir,
-                _options,
-            );
+            run_command(
+                &format!(
+                    "cargo zigbuild --target aarch64-unknown-linux-gnu --features={}",
+                    features_normal.join(",")
+                ),
+                _options.config.command_output,
+            )
+            .unwrap();
             copy_file(
-                &format!("../target/debug/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-gnu/debug/{}", &QINIT_BINARY),
                 &format!("../out/{}{}", &QINIT_BINARY, &QINIT_GUI_ONLY_SUFFIX),
             )
             .unwrap();
         } else {
-            Sysroot::execute_sysroot_command_dir(
+            run_command(
                 &format!(
-                    "cargo build --release --features={}",
+                    "cargo zigbuild --release --target aarch64-unknown-linux-gnu --features={}",
                     features_normal.join(",")
                 ),
-                &cur_dir,
-                _options,
-            );
+                _options.config.command_output,
+            )
+            .unwrap();
             copy_file(
-                &format!("../target/release/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-gnu/release/{}", &QINIT_BINARY),
                 &format!("../out/{}", &QINIT_BINARY),
             )
             .unwrap();
-            Sysroot::execute_sysroot_command_dir(
+            run_command(
                 &format!(
-                    "cargo build --release --features={}",
+                    "cargo zigbuild --release --target aarch64-unknown-linux-gnu --features={}",
                     features_wrapper.join(",")
                 ),
-                &cur_dir,
-                _options,
-            );
+                _options.config.command_output,
+            )
+            .unwrap();
             copy_file(
-                &format!("../target/release/{}", &QINIT_BINARY),
+                &format!("../target/aarch64-unknown-linux-gnu/release/{}", &QINIT_BINARY),
                 "../out/init",
             )
             .unwrap();
         }
+        dir_change(&cur_dir);
         Ok(())
     }
 
