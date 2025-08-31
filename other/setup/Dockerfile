@@ -3,9 +3,10 @@ FROM ubuntu:24.04
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
 RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio vim
+ENV PATH="${PATH}:/workspaces/quillstrap/other/path"
 
 # Rust stuff
-RUN apt-get install -y gcc build-essential curl pkg-config libinput10 pkg-config libusb-1.0-0-dev libftdi1-dev libudev-dev
+RUN apt-get install -y gcc build-essential curl ca-certificates pkg-config libinput10 pkg-config libusb-1.0-0-dev libftdi1-dev libudev-dev
 ENV PATH="${PATH}:/root/.cargo/bin"
 
 # VS Code stuff
@@ -57,13 +58,14 @@ RUN apt-get install -y python3-numpy
 RUN apt-get install -y squashfs-tools
 
 # Zig (for cargo zigbuild)
+ARG ZIG_VERSION=0.15.1
 RUN set -e; \
     arch="$(dpkg --print-architecture)"; \
     case "$arch" in \
-        amd64) url="https://ziglang.org/builds/zig-x86_64-linux-0.16.0-dev.65+ca2e17e0a.tar.xz" ;; \
-        arm64) url="https://ziglang.org/builds/zig-aarch64-linux-0.16.0-dev.65+ca2e17e0a.tar.xz" ;; \
+        amd64) url="https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" ;; \
+        arm64) url="https://ziglang.org/download/${ZIG_VERSION}/zig-aarch64-linux-${ZIG_VERSION}.tar.xz" ;; \
         *) echo "Unsupported architecture: $arch" && exit 1 ;; \
     esac; \
-    curl -L "$url" -o /tmp/zig.tar.xz
-
-RUN tar -xJf /tmp/zig.tar.xz -C /usr/bin --strip-components=1 && rm /tmp/zig.tar.xz
+    curl -fSL -o /tmp/zig.tar.xz "$url"; \
+    tar -xJf /tmp/zig.tar.xz -C /usr/bin --strip-components=1; \
+    rm /tmp/zig.tar.xz
