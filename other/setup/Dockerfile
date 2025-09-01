@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
-RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio vim
+RUN apt-get update && apt-get install -y ripgrep htop psmisc wget unzip file tio vim
 ENV PATH="${PATH}:/workspaces/quillstrap/other/path"
 
 # Rust stuff
