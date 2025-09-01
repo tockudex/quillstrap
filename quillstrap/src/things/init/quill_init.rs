@@ -137,11 +137,15 @@ impl SetupThing for QuillInit {
             )
             .unwrap();
         }
+
         dir_change(&cur_dir);
         Ok(())
     }
 
     fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        let cur_dir = dir_current();
+        dir_change(&QINIT_SRC_DIR);
+
         if !_options.args.quill_init_options.qi_ssh_build {
             error!("This is not a ssh build, yet we are deplying to ssh. You have been warned!");
         }
@@ -149,7 +153,7 @@ impl SetupThing for QuillInit {
             .config
             .qinit_options
             .deploy_ssh_ip_addr
-            .map(|b| std::str::from_utf8(&[b]).unwrap().to_string())
+            .map(|b| b.to_string())
             .join(".");
 
         run_command(
@@ -183,6 +187,7 @@ impl SetupThing for QuillInit {
         )
         .unwrap();
 
+        dir_change(&cur_dir);
         Ok(())
     }
 
