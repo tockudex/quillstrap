@@ -62,8 +62,8 @@ ARG ZIG_VERSION=0.15.1
 RUN set -e; \
     arch="$(dpkg --print-architecture)"; \
     case "$arch" in \
-        amd64) url="https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" ;; \
-        arm64) url="https://ziglang.org/download/${ZIG_VERSION}/zig-aarch64-linux-${ZIG_VERSION}.tar.xz" ;; \
+        amd64) url="https://github.com/PorQ-Pine/zig-package/releases/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" ;; \
+        arm64) url="https://github.com/PorQ-Pine/zig-package/releases/download/${ZIG_VERSION}/zig-aarch64-linux-${ZIG_VERSION}.tar.xz" ;; \
         *) echo "Unsupported architecture: $arch" && exit 1 ;; \
     esac; \
     curl -fSL -o /tmp/zig.tar.xz "$url"; \
