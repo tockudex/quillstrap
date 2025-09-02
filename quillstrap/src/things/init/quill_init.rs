@@ -53,10 +53,6 @@ impl SetupThing for QuillInit {
         let full_path = get_path_of_thing_native(self, _options);
         set_var("PKG_CONFIG_ALLOW_CROSS", "1");
         set_var(
-            "PKG_CONFIG_SYSROOT_DIR",
-            &format!("{}../sysroot", full_path),
-        );
-        set_var(
             "PKG_CONFIG_PATH",
             &format!("{}../sysroot/usr/lib/pkgconfig", full_path),
         );
@@ -105,7 +101,10 @@ impl SetupThing for QuillInit {
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-musl/debug/{}", &QINIT_BINARY),
+                &format!(
+                    "../target/aarch64-unknown-linux-musl/debug/{}",
+                    &QINIT_BINARY
+                ),
                 &format!("../out/{}{}", &QINIT_BINARY, &QINIT_GUI_ONLY_SUFFIX),
             )
             .unwrap();
@@ -119,7 +118,10 @@ impl SetupThing for QuillInit {
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-musl/release/{}", &QINIT_BINARY),
+                &format!(
+                    "../target/aarch64-unknown-linux-musl/release/{}",
+                    &QINIT_BINARY
+                ),
                 &format!("../out/{}", &QINIT_BINARY),
             )
             .unwrap();
@@ -132,12 +134,24 @@ impl SetupThing for QuillInit {
             )
             .unwrap();
             copy_file(
-                &format!("../target/aarch64-unknown-linux-musl/release/{}", &QINIT_BINARY),
+                &format!(
+                    "../target/aarch64-unknown-linux-musl/release/{}",
+                    &QINIT_BINARY
+                ),
                 "../out/init",
             )
             .unwrap();
         }
 
+        set_var("PKG_CONFIG_ALLOW_CROSS", "");
+        set_var("PKG_CONFIG_SYSROOT_DIR", "");
+        set_var("PKG_CONFIG_PATH", "");
+        set_var("PKG_CONFIG_ALLOW_CROSS", "");
+        set_var("PKG_CONFIG_SYSROOT_DIR", "");
+        set_var("PKG_CONFIG_PATH", "");
+        set_var("OPENSSL_INCLUDE_DIR", "");
+        set_var("RUSTFLAGS", "");
+        
         dir_change(&cur_dir);
         Ok(())
     }
