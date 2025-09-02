@@ -152,7 +152,7 @@ impl SetupThing for QuillInit {
         let ip_str = _options
             .config
             .qinit_options
-            .deploy_ssh_ip_addr
+            .deploy_ip_addr
             .map(|b| b.to_string())
             .join(".");
 
@@ -164,22 +164,26 @@ impl SetupThing for QuillInit {
             false,
         )
         .unwrap();
-        run_command(
+        run_shell_command(
             &format!(
-                "scp -P {} ../out/{}{} root@{}:/tmp",
-                &_options.config.qinit_options.deploy_ssh_port,
+                "lftp {}:{} -e 'put ../out/{}{} -o /tmp/{}{}; bye'",
+                &ip_str,
+                &_options.config.qinit_options.deploy_ftp_port,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX,
-                &ip_str
+                &QINIT_BINARY,
+                &QINIT_GUI_ONLY_SUFFIX,
             ),
             true,
         )
         .unwrap();
         run_shell_command(
             &format!(
-                "ssh -t -p {} root@{} 'RUST_LOG=info SLINT_KMS_ROTATION=270 SLINT_BACKEND_LINUXFB=1 /tmp/{}{}'",
+                "ssh -t -p {} root@{} 'chmod 755 /tmp/{}{} && RUST_LOG=info SLINT_KMS_ROTATION=270 SLINT_BACKEND_LINUXFB=1 /tmp/{}{}'",
                 &_options.config.qinit_options.deploy_ssh_port,
                 &ip_str,
+                &QINIT_BINARY,
+                &QINIT_GUI_ONLY_SUFFIX,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX
             ),

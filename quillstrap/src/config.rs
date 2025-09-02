@@ -25,8 +25,9 @@ pub enum GitPlatform {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct QinitOptions {
-    pub deploy_ssh_ip_addr: [u8; 4], // Default for us is 192.168.3.2
+    pub deploy_ip_addr: [u8; 4], // Default for us is 192.168.3.2
     pub deploy_ssh_port: u16,
+    pub deploy_ftp_port: u16,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
@@ -57,8 +58,9 @@ impl Default for Config {
             root_password: "root".to_string(),
             unsecure_debug: false, // :(
             qinit_options: QinitOptions {
-                deploy_ssh_ip_addr: [0, 0, 0, 0],
+                deploy_ip_addr: [0, 0, 0, 0],
                 deploy_ssh_port: 2222,
+                deploy_ftp_port: 2221,
             },
         }
     }
@@ -110,7 +112,7 @@ impl Config {
     }
 
     pub fn validate(&self) {
-        if self.qinit_options.deploy_ssh_ip_addr == [0,0,0,0] {
+        if self.qinit_options.deploy_ip_addr == [0,0,0,0] {
             warn!("The qinit deploy ip address is not set, it will not work!");
         }
     }
