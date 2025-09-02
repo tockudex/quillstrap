@@ -38,3 +38,5 @@ pub use crate::os::low::rootfs_configs::*;
 pub use crate::os::low::rootfs_sysroot::*;
 pub use crate::os::low::qoms::*;
 pub use std::io::Write;
+pub use crate::os::gui::slint_gallery::*;
+pub use std::fs::remove_dir_all;

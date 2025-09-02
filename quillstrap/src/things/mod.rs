@@ -28,6 +28,7 @@ pub enum TraitWrapper {
     TwSerialLaunch(SerialLaunch),
     TwRootfsSysroot(RootfsSysroot),
     TwQoms(Qoms),
+    TwSlintGallery(SlintGallery),
 }
 
 // This is weird but I won't kill you with lifetimes at least
@@ -54,6 +55,7 @@ macro_rules! forward {
             TraitWrapper::TwSerialLaunch(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwRootfsSysroot(inner) => inner.$method($($($arg),*)?),
             TraitWrapper::TwQoms(inner) => inner.$method($($($arg),*)?),
+            TraitWrapper::TwSlintGallery(inner) => inner.$method($($($arg),*)?),
         }
     };
 }
@@ -119,6 +121,7 @@ pub fn get_things() -> Vec<TraitWrapper> {
         TwSerialLaunch(Default::default()),
         TwRootfsSysroot(Default::default()),
         TwQoms(Default::default()),
+        TwSlintGallery(Default::default()),
     ]
 }
 

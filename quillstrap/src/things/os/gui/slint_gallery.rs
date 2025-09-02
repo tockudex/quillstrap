@@ -1,15 +1,15 @@
 use crate::prelude::*;
 
 #[derive(Clone, Copy, Default)]
-pub struct Qoms;
+pub struct SlintGallery;
 
-impl SetupThing for Qoms {
+impl SetupThing for SlintGallery {
     fn name(&self) -> &'static str {
-        "qoms"
+        "slint_gallery"
     }
 
     fn path(&self) -> &'static str {
-        "os/low/"
+        "os/gui/"
     }
 
     fn deps(&self) -> Vec<&'static str> {
@@ -17,7 +17,7 @@ impl SetupThing for Qoms {
     }
 
     fn git(&self) -> &'static str {
-        "qoms"
+        "slint-gallery"
     }
 
     fn get(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
@@ -26,27 +26,28 @@ impl SetupThing for Qoms {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
-        dir_change("qoms");
-        run_command("cargo clean", true).unwrap();
-        dir_change("../");
         Ok(())
     }
 
     fn build(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
-        dir_change("qoms");
+        mkdir_p("out");
+        // Building for host
+        run_command("cargo build --release --features=host", _options.config.command_output).unwrap();
+        copy_file(
+            "target/release/gallery",
+            "out/slint_gallery_host",
+        )
+        .unwrap();
 
+        // Building for rootfs
         set_var("PKG_CONFIG_ALLOW_CROSS", "1");
-        set_var("PKG_CONFIG_SYSROOT_DIR", "../../rootfs_sysroot/sysroot");
-        /*
-        set_var(
-            "PKG_CONFIG_PATH",
-            "../../rootfs_sysroot/sysroot/usr/lib/aarch64-linux-gnu/pkgconfig",
-        );
-        */
-        set_var("RUSTFLAGS", "-L ../../rootfs_sysroot/sysroot/usr/lib64");
+        set_var("PKG_CONFIG_SYSROOT_DIR", "/workspaces/quillstrap/build_all/os/low/rootfs_sysroot/sysroot");
+        set_var("RUSTFLAGS", "-L /workspaces/quillstrap/build_all/os/low/rootfs_sysroot/sysroot/usr/lib64");
+        // set_var("CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER", "aarch64-linux-gnu-gcc");
 
+        // Important! glibc version specified by zig
         run_command(
-            "cargo zigbuild --release --target aarch64-unknown-linux-gnu",
+            "cargo zigbuild --release --features=pinenote --target aarch64-unknown-linux-gnu.2.41",
             _options.config.command_output,
         )
         .unwrap();
@@ -56,13 +57,13 @@ impl SetupThing for Qoms {
         set_var("PKG_CONFIG_PATH", "");
         set_var("RUSTFLAGS", "");
 
-        dir_change("../");
-        mkdir_p("out");
         copy_file(
-            "qoms/target/aarch64-unknown-linux-gnu/release/qoms",
-            "out/qoms",
+            "target/aarch64-unknown-linux-gnu/release/gallery",
+            "out/slint_gallery_rootfs",
         )
         .unwrap();
+
+        // Building for initrd
         Ok(())
     }
 

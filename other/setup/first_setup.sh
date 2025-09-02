@@ -4,7 +4,7 @@
 
 if ! command -v ~/.cargo/bin/cargo &> /dev/null || \
    ! command -v ~/.cargo/bin/rustup &> /dev/null || \
-   ! command -v ~/.cargo/bin/rmodem &> /dev/null || \
+   ! command -v ~/.cargo/bin/cargo-zigbuild &> /dev/null || \
    ! command -v ~/.cargo/bin/cbindgen &> /dev/null; then
        
     echo "Installing Rust"
@@ -15,7 +15,7 @@ if ! command -v ~/.cargo/bin/cargo &> /dev/null || \
 
     ~/.cargo/bin/cargo install --force cbindgen
 
-    ~/.cargo/bin/cargo install --features 'cli' --force rmodem
+    ~/.cargo/bin/cargo install --locked cargo-zigbuild
 else
     echo "Rust is already installed, skipping installation."
 fi

@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
-const ESSENTIAL_PACKAGES: &[&str] = &["zsh", "vim", "nano", "busybox", "libinput", "libinput-devel", "libinput-utils"];
+// ZSH is installed in build code seperately in rootfs
+const ESSENTIAL_PACKAGES_SYSROOT: &[&str] = &["zsh", "libinput-devel", "libxkbcommon-devel"];
 
 #[derive(Clone, Copy, Default)]
 pub struct RootfsSysroot;
@@ -47,6 +48,9 @@ impl SetupThing for RootfsSysroot {
     }
 
     fn clean(&self) -> std::result::Result<(), String> {
+        remove_dir_all("sysroot/").ok();
+        mkdir_p("sysroot");
+        run_command(&format!("tar -xJf ../rootfs/rootfs.tar.xz -C sysroot"), true).unwrap();
         Ok(())
     }
 
@@ -56,9 +60,11 @@ impl SetupThing for RootfsSysroot {
 
         // Packages
         Rootfs::execute(RD, "dnf --assumeyes update", true);
+        let mut packages = Vec::from(ESSENTIAL_PACKAGES_SYSROOT);
+        packages.extend(ROOTFS_PACKAGES_EVERYWHERE);
         Rootfs::execute(
             RD,
-            &format!("dnf --assumeyes install {}", ESSENTIAL_PACKAGES.join(" ")),
+            &format!("dnf --assumeyes install {}", packages.join(" ")),
             true,
         );
 
