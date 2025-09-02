@@ -179,7 +179,7 @@ impl SetupThing for QuillInit {
         .unwrap();
         run_shell_command(
             &format!(
-                "ssh -t -p {} root@{} 'chmod 755 /tmp/{}{} && RUST_LOG=info SLINT_KMS_ROTATION=270 SLINT_BACKEND_LINUXFB=1 /tmp/{}{}'",
+                "ssh -t -p {} root@{} 'chmod 755 /tmp/{}{} && RUST_LOG=debug SLINT_KMS_ROTATION=270 SLINT_BACKEND_LINUXFB=1 /tmp/{}{}'",
                 &_options.config.qinit_options.deploy_ssh_port,
                 &ip_str,
                 &QINIT_BINARY,
