@@ -137,19 +137,23 @@ impl SetupThing for QuillInit {
             )
             .unwrap();
         }
+
         dir_change(&cur_dir);
         Ok(())
     }
 
     fn deploy(&self, _options: &crate::Options) -> color_eyre::eyre::Result<(), String> {
+        let cur_dir = dir_current();
+        dir_change(&QINIT_SRC_DIR);
+
         if !_options.args.quill_init_options.qi_ssh_build {
             error!("This is not a ssh build, yet we are deplying to ssh. You have been warned!");
         }
         let ip_str = _options
             .config
             .qinit_options
-            .deploy_ssh_ip_addr
-            .map(|b| std::str::from_utf8(&[b]).unwrap().to_string())
+            .deploy_ip_addr
+            .map(|b| b.to_string())
             .join(".");
 
         run_command(
@@ -160,22 +164,26 @@ impl SetupThing for QuillInit {
             false,
         )
         .unwrap();
-        run_command(
+        run_shell_command(
             &format!(
-                "scp -P {} ../out/{}{} root@{}:/tmp",
-                &_options.config.qinit_options.deploy_ssh_port,
+                "lftp {}:{} -e 'put ../out/{}{} -o /tmp/{}{}; bye'",
+                &ip_str,
+                &_options.config.qinit_options.deploy_ftp_port,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX,
-                &ip_str
+                &QINIT_BINARY,
+                &QINIT_GUI_ONLY_SUFFIX,
             ),
             true,
         )
         .unwrap();
         run_shell_command(
             &format!(
-                "ssh -t -p {} root@{} 'RUST_LOG=info SLINT_KMS_ROTATION=270 /tmp/{}{}'",
+                "ssh -t -p {} root@{} 'chmod 755 /tmp/{}{} && RUST_LOG=debug SLINT_KMS_ROTATION=270 SLINT_BACKEND_LINUXFB=1 /tmp/{}{}'",
                 &_options.config.qinit_options.deploy_ssh_port,
                 &ip_str,
+                &QINIT_BINARY,
+                &QINIT_GUI_ONLY_SUFFIX,
                 &QINIT_BINARY,
                 &QINIT_GUI_ONLY_SUFFIX
             ),
@@ -183,6 +191,7 @@ impl SetupThing for QuillInit {
         )
         .unwrap();
 
+        dir_change(&cur_dir);
         Ok(())
     }
 

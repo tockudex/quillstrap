@@ -14,6 +14,7 @@ const ESSENTIAL_PACKAGES: &[&str] = &[
     "nano",
     "busybox",
     "htop",
+    "cracklib-dicts",
 ];
 
 #[derive(Clone, Copy, Default)]

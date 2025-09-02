@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 # Missing stuff in container
 # For some reason, apt update needs to be with the first install via &&
-RUN apt-get update && apt-get install -y htop psmisc wget unzip file tio vim
+RUN apt-get update && apt-get install -y ripgrep htop psmisc wget unzip file tio vim
 ENV PATH="${PATH}:/workspaces/quillstrap/other/path"
 
 # Rust stuff
@@ -16,7 +16,10 @@ RUN apt-get install -y git libxkbcommon-dev libgbm-dev
 RUN apt-get install -y openssl libssl-dev clang
 
 # U-boot build
-RUN apt-get install -y coreutils device-tree-compiler python3 python3-pyelftools gcc-aarch64-linux-gnu 
+RUN apt-get install -y coreutils device-tree-compiler python3 python3-pyelftools gcc-aarch64-linux-gnu
+
+# quill-init deployment
+RUN apt-get install -y lftp
 
 ## U-boot boot menu
 RUN apt-get install -y python3-pillow fonts-dejavu-core fonts-freefont-ttf fontconfig imagemagick libpng-dev cmake
@@ -47,7 +50,7 @@ RUN apt-get install -y libncurses-dev flex bison libgmp-dev libmpc-dev libssl-de
 RUN apt-get install -y qemu-user-static binfmt-support
 RUN update-binfmts --enable
 
-# Expose eemc & Backup mmc
+# Expose eMMC & backup eMMC
 # Some of those are not needed but whatever
 RUN apt-get install -y picocom lrzsz ckermit qemu-utils expect parted fdisk
 
