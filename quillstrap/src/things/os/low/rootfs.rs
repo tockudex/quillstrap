@@ -11,18 +11,22 @@ pub const ROOTFS_RESOLV_FILE: &str =
 const ESSENTIAL_PACKAGES: &[&str] = &[
     "NetworkManager",
     "NetworkManager-wifi",
-    "busybox",
     "cracklib-dicts",
 ];
 
 // Also installed in sysroot
 pub const ROOTFS_PACKAGES_EVERYWHERE: &[&str] = &[
+    "busybox",
     "htop",
     "vim",
     "nano",
+    "less",
+    "ncurses",
+    // Libs
     "libxkbcommon",
     "libinput-utils",
     "libinput",
+    "fontconfig",
 ];
 
 #[derive(Clone, Copy, Default)]
@@ -192,7 +196,7 @@ impl SetupThing for Rootfs {
         // Other configs, manually
         // Dropbear
         if _options.config.unsecure_debug {
-            Rootfs::execute(RD, &format!("dnf --assumeyes install dropbear"), true);
+            Rootfs::execute(RD, &format!("dnf --assumeyes install dropbear openssh-server"), true);
             create_file_symlink(
                 "../../boot/rsa_hkey",
                 &format!(" {}etc/dropbear/dropbear_rsa_host_key", RD),
@@ -201,6 +205,7 @@ impl SetupThing for Rootfs {
                 "../../boot/rsa_hkey.pub",
                 &format!(" {}etc/dropbear/dropbear_rsa_host_key.pub", RD),
             );
+            Rootfs::disable_service(RD, "sshd");
         }
 
         // Root password (for now at least)
