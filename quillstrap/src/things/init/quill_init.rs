@@ -62,12 +62,6 @@ impl SetupThing for QuillInit {
             &format!("{}../sysroot", full_path),
         );
         set_var(
-            "PKG_CONFIG_PATH",
-            &format!("{}../sysroot/usr/lib/pkgconfig", full_path),
-        );
-        // set_var("OPENSSL_DIR", "../../sysroot/usr/include/openssl");
-        // set_var("OPENSSL_LIB_DIR", "../../sysroot/usr/lib");
-        set_var(
             "OPENSSL_INCLUDE_DIR",
             &format!("{}../sysroot/usr/include/openssl", full_path),
         );
@@ -148,7 +142,6 @@ impl SetupThing for QuillInit {
         set_var("PKG_CONFIG_PATH", "");
         set_var("PKG_CONFIG_ALLOW_CROSS", "");
         set_var("PKG_CONFIG_SYSROOT_DIR", "");
-        set_var("PKG_CONFIG_PATH", "");
         set_var("OPENSSL_INCLUDE_DIR", "");
         set_var("RUSTFLAGS", "");
         
