@@ -1,7 +1,17 @@
 use crate::prelude::*;
 
 // ZSH is installed in build code seperately in rootfs
-const ESSENTIAL_PACKAGES_SYSROOT: &[&str] = &["zsh", "libinput-devel", "libxkbcommon-devel"];
+const ESSENTIAL_PACKAGES_SYSROOT: &[&str] = &[
+    "zsh",
+    "libinput-devel",
+    "libxkbcommon-devel",
+    "fontconfig-devel",
+    "freetype-devel",
+    "mesa-libgbm-devel",
+    "llvm",
+    "clang",
+    "ldd",
+];
 
 #[derive(Clone, Copy, Default)]
 pub struct RootfsSysroot;
@@ -50,7 +60,11 @@ impl SetupThing for RootfsSysroot {
     fn clean(&self) -> std::result::Result<(), String> {
         remove_dir_all("sysroot/").ok();
         mkdir_p("sysroot");
-        run_command(&format!("tar -xJf ../rootfs/rootfs.tar.xz -C sysroot"), true).unwrap();
+        run_command(
+            &format!("tar -xJf ../rootfs/rootfs.tar.xz -C sysroot"),
+            true,
+        )
+        .unwrap();
         Ok(())
     }
 

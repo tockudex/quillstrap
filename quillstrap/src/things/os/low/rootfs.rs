@@ -27,6 +27,8 @@ pub const ROOTFS_PACKAGES_EVERYWHERE: &[&str] = &[
     "libinput-utils",
     "libinput",
     "fontconfig",
+    "freetype",
+    "mesa-libgbm",
 ];
 
 #[derive(Clone, Copy, Default)]

@@ -26,6 +26,11 @@ impl SetupThing for SlintGallery {
     }
 
     fn clean(&self) -> color_eyre::eyre::Result<(), String> {
+        run_command(
+            "cargo clean",
+            true,
+        )
+        .unwrap();
         Ok(())
     }
 
@@ -34,27 +39,23 @@ impl SetupThing for SlintGallery {
         let full_path = get_path_of_thing_native(self, _options);
 
         // Building for host
+        /*
         run_command(
             "cargo build --release --features=host",
             _options.config.command_output,
         )
         .unwrap();
         copy_file("target/release/gallery", "out/slint_gallery_host").unwrap();
-
+        */
+        
         // Building for rootfs
         set_var("PKG_CONFIG_ALLOW_CROSS", "1");
-        set_var(
-            "PKG_CONFIG_SYSROOT_DIR",
-            "../../low/rootfs_sysroot/sysroot",
-        );
-        set_var(
-            "RUSTFLAGS",
-            "-L ../../low/rootfs_sysroot/sysroot/usr/lib64",
-        );
+        set_var("PKG_CONFIG_SYSROOT_DIR", "../../low/rootfs_sysroot/sysroot");
+        set_var("RUSTFLAGS", "-L ../../low/rootfs_sysroot/sysroot/usr/lib64");
 
         // Important! glibc version specified by zig
         run_command(
-            "cargo zigbuild --release --features=pinenote --target aarch64-unknown-linux-gnu.2.41",
+            "cargo zigbuild --release --features=pinenote_rootfs --target aarch64-unknown-linux-gnu.2.41",
             _options.config.command_output,
         )
         .unwrap();
@@ -93,7 +94,7 @@ impl SetupThing for SlintGallery {
         );
 
         run_command(
-            "cargo zigbuild --release --features=pinenote --target aarch64-unknown-linux-musl",
+            "cargo zigbuild --release --features=pinenote_initrd --target aarch64-unknown-linux-musl",
             _options.config.command_output,
         )
         .unwrap();
