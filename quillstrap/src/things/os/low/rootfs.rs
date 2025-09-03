@@ -16,7 +16,14 @@ const ESSENTIAL_PACKAGES: &[&str] = &[
 ];
 
 // Also installed in sysroot
-pub const ROOTFS_PACKAGES_EVERYWHERE: &[&str] = &["htop", "vim", "nano", "libxkbcommon", "libinput-utils", "libinput"];
+pub const ROOTFS_PACKAGES_EVERYWHERE: &[&str] = &[
+    "htop",
+    "vim",
+    "nano",
+    "libxkbcommon",
+    "libinput-utils",
+    "libinput",
+];
 
 #[derive(Clone, Copy, Default)]
 pub struct Rootfs;
@@ -160,6 +167,7 @@ impl SetupThing for Rootfs {
             copy_dir_content("../rootfs_configs/restricted", RD);
         }
 
+        // Zsh
         {
             Rootfs::execute(
                 RD,
@@ -174,28 +182,25 @@ impl SetupThing for Rootfs {
                 _options.config.command_output,
             );
             Rootfs::execute(RD, &format!("chsh -s /usr/bin/zsh root"), true);
+            mkdir_p(&format!("{}etc/zsh/zsh-autosuggestions", RD));
+            create_file_symlink(
+                "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh",
+                &format!("{}etc/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh", RD),
+            );
         }
 
         // Other configs, manually
         // Dropbear
         if _options.config.unsecure_debug {
             Rootfs::execute(RD, &format!("dnf --assumeyes install dropbear"), true);
-            run_command(
-                &format!(
-                    "ln -s ../../boot/rsa_hkey {}etc/dropbear/dropbear_rsa_host_key",
-                    RD
-                ),
-                _options.config.command_output,
-            )
-            .unwrap();
-            run_command(
-                &format!(
-                    "ln -s ../../boot/rsa_hkey.pub {}etc/dropbear/dropbear_rsa_host_key.pub",
-                    RD
-                ),
-                _options.config.command_output,
-            )
-            .unwrap();
+            create_file_symlink(
+                "../../boot/rsa_hkey",
+                &format!(" {}etc/dropbear/dropbear_rsa_host_key", RD),
+            );
+            create_file_symlink(
+                "../../boot/rsa_hkey.pub",
+                &format!(" {}etc/dropbear/dropbear_rsa_host_key.pub", RD),
+            );
         }
 
         // Root password (for now at least)

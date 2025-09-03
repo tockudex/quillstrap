@@ -145,3 +145,7 @@ pub fn append_to_file(path: &str, string: &str) {
         path
     ));
 }
+
+pub fn create_file_symlink(symlink_to: &str, path_of_symlink: &str) {
+    run_command(&format!("ln -s {} {}", symlink_to, path_of_symlink), true).unwrap();
+}
