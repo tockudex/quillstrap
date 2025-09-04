@@ -31,6 +31,43 @@ pub const ROOTFS_PACKAGES_EVERYWHERE: &[&str] = &[
     "mesa-libgbm",
 ];
 
+const ROOTFS_BLACKLIST: &[&str] = &[
+    "grub2-*",
+    "grubby",
+    "kernel-core",
+    "kernel-modules",
+    "amd-gpu-firmware",
+    "intel-gpu-firmware",
+    "atheros-firmware",
+    "brcmfmac-firmware",
+    "iwlwifi-*",
+    "libertas-firmware",
+    "mt7xxx-firmware",
+    "nvidia-gpu-firmware",
+    "nxpwireless-firmware",
+    "qcom-firmware",
+    "qcom-wwan-firmware",
+    "realtek-firmware",
+    "tiwilink-firmware",
+    "intel-audio-firmware",
+    "cirrus-audio-firmware",
+    "linux-firmware",
+    "amd-ucode-firmware",
+    "xorg-x11-drv-amdgpu",
+    "xorg-x11-drv-ati",
+    "xorg-x11-drv-nouveau",
+    "xorg-x11-drv-qxl",
+    "xorg-x11-drv-wacom",
+    "dracut*",
+    "fwupd*",
+    "plymouth*",
+    "zram-generator*",
+    "open-vm-tools*",
+    "qemu-guest-agent",
+    "qemu-img",
+    "selinux*",
+];
+
 #[derive(Clone, Copy, Default)]
 pub struct Rootfs;
 
@@ -137,6 +174,17 @@ impl SetupThing for Rootfs {
         const RD: &str = "rootfs/";
         Rootfs::turn_on_chroot(RD);
 
+        // Configs from other repo
+        copy_dir_content("../rootfs_configs/common", RD);
+        if _options.config.unrestricted {
+            copy_dir_content("../rootfs_configs/unrestricted", RD);
+        } else {
+            copy_dir_content("../rootfs_configs/restricted", RD);
+        }
+
+        // Apply dnf blacklist
+        append_to_file(&format!("{}etc/dnf/dnf.conf", RD), &format!("exclude=\"{}\"", ROOTFS_BLACKLIST.join(",")));
+
         // Packages
         Rootfs::execute(RD, "dnf --assumeyes update", true);
         let mut packages = Vec::from(ESSENTIAL_PACKAGES);
@@ -164,14 +212,6 @@ impl SetupThing for Rootfs {
         Rootfs::disable_service(RD, "systemd-time-wait-sync");
         Rootfs::disable_service(RD, "serial-getty@");
         Rootfs::disable_service(RD, "getty@tty1");
-
-        // Configs from other repo
-        copy_dir_content("../rootfs_configs/common", RD);
-        if _options.config.unrestricted {
-            copy_dir_content("../rootfs_configs/unrestricted", RD);
-        } else {
-            copy_dir_content("../rootfs_configs/restricted", RD);
-        }
 
         // Zsh
         {
