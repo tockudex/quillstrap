@@ -233,6 +233,8 @@ impl SetupThing for Rootfs {
                 "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh",
                 &format!("{}etc/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh", RD),
             );
+
+            remove_file(&format!("{}etc/skel/.zshrc.rpmnew", RD), false).ok();
         }
 
         // Other configs, manually
@@ -285,6 +287,17 @@ impl SetupThing for Rootfs {
             "systemd-machine-id-setup",
             _options.config.command_output,
         );
+
+        // Upower hacky fix, make a proper fix in the future!
+        Rootfs::execute(RD, &format!("dnf --assumeyes install upower"), true);
+        let upower_service_file = &format!("{}usr/lib/systemd/system/upower.service", RD);
+        let file = read_file_str(upower_service_file.to_string()).unwrap();
+        if !file.contains("# PrivateUsers=yes") {
+            replace_string_file(upower_service_file, "PrivateUsers=yes", "# PrivateUsers=yes");
+        }
+        if !file.contains("# RestrictNamespaces=yes") {
+            replace_string_file(upower_service_file, "RestrictNamespaces=yes", "# RestrictNamespaces=yes");
+        }
 
         // Cleanout
         umount_recursive(RD);
